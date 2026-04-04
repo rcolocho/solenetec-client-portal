@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Solenetec Client Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+  :root {
+    --blue:       #1a56db;
+    --blue-lt:    #eff4ff;
+    --blue-mid:   #dbeafe;
+    --blue-dark:  #1e40af;
+    --green:      #15803d;
+    --green-lt:   #dcfce7;
+    --amber:      #92400e;
+    --amber-lt:   #fef3c7;
+    --amber-mid:  #f59e0b;
+    --gray-50:    #f7f8fa;
+    --gray-100:   #f0f2f5;
+    --gray-200:   #e8eaed;
+    --gray-300:   #d1d5db;
+    --gray-400:   #9ca3af;
+    --gray-500:   #6b7280;
+    --gray-700:   #374151;
+    --gray-800:   #1f2937;
+    --gray-900:   #111827;
+    --red-lt:     #fef2f2;
+    --red:        #dc2626;
+    --purple-lt:  #f5f3ff;
+    --purple:     #7c3aed;
+    --teal-lt:    #f0fdfa;
+    --teal:       #0d9488;
+    --sidebar-w:  220px;
+    --topbar-h:   56px;
+    --radius-sm:  6px;
+    --radius-md:  8px;
+    --radius-lg:  12px;
+    --shadow-sm:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-md:  0 4px 12px rgba(0,0,0,.07);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    min-height: 100vh;
+    display: flex;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: #fff;
+    border-right: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-brand {
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-mark {
+    width: 32px; height: 32px;
+    background: var(--blue);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .brand-mark i { color: #fff; font-size: 14px; }
+  .brand-text { display: flex; flex-direction: column; }
+  .brand-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700; font-size: 14px;
+    color: var(--gray-900); line-height: 1.1;
+  }
+  .brand-sub { font-size: 10px; color: var(--gray-400); font-weight: 400; margin-top: 1px; }
+
+  .sidebar-section { padding: 12px 8px 4px; }
+  .sidebar-section-label {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: .07em; text-transform: uppercase;
+    color: var(--gray-400); padding: 0 8px; margin-bottom: 4px;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    font-size: 13px; font-weight: 400;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: background .12s, color .12s;
+    text-decoration: none;
+    margin: 1px 0;
+  }
+  .nav-item i { width: 16px; text-align: center; font-size: 13px; flex-shrink: 0; }
+  .nav-item:hover { background: var(--gray-100); color: var(--gray-800); }
+  .nav-item.active {
+    background: var(--blue-lt);
+    color: var(--blue);
+    font-weight: 500;
+  }
+  .nav-item .badge-count {
+    margin-left: auto;
+    background: var(--blue);
+    color: #fff;
+    font-size: 10px; font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 20px;
+    min-width: 18px; text-align: center;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 8px;
+    border-top: 1px solid var(--gray-200);
+  }
+  .client-chip {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+  }
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--blue-mid);
+    color: var(--blue-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .client-chip .client-name { font-size: 12px; font-weight: 500; color: var(--gray-800); }
+  .client-chip .client-role { font-size: 10px; color: var(--gray-400); }
+  .logout-btn {
+    margin-left: auto;
+    background: none; border: none; cursor: pointer;
+    color: var(--gray-400); font-size: 12px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color .12s;
+  }
+  .logout-btn:hover { color: var(--red); }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    height: var(--topbar-h);
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex; align-items: center;
+    padding: 0 28px;
+    gap: 16px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600; font-size: 17px;
+    color: var(--gray-900);
+    flex: 1;
+  }
+  .topbar-title span { color: var(--gray-400); font-weight: 400; font-size: 13px; margin-left: 8px; }
+  .status-pill {
+    font-size: 11px; font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: .03em;
+  }
+  .status-pill.active { background: var(--green-lt); color: var(--green); }
+  .status-pill.pending { background: var(--amber-lt); color: var(--amber); }
+  .topbar-icon {
+    width: 34px; height: 34px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gray-500); cursor: pointer;
+    transition: background .12s;
+    position: relative;
+  }
+  .topbar-icon:hover { background: var(--gray-100); }
+  .notif-dot {
+    width: 7px; height: 7px;
+    background: var(--red);
+    border-radius: 50%;
+    position: absolute; top: 6px; right: 6px;
+    border: 1.5px solid #fff;
+  }
+
+  /* ── PAGE CONTENT ── */
+  .page-content { padding: 28px; display: flex; flex-direction: column; gap: 28px; }
+
+  /* ── STAT CARDS ROW ── */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .stat-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 4px;
+    transition: box-shadow .15s;
+  }
+  .stat-card:hover { box-shadow: var(--shadow-sm); }
+  .stat-card.accent { border-left: 3px solid var(--blue); }
+  .stat-label {
+    font-size: 11px; font-weight: 500;
+    color: var(--gray-400);
+    text-transform: uppercase; letter-spacing: .05em;
+  }
+  .stat-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--gray-900);
+    line-height: 1.1;
+  }
+  .stat-sub { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+  .stat-sub.green { color: var(--green); }
+  .stat-sub.blue { color: var(--blue); }
+  .stat-sub.amber { color: var(--amber-mid); }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--gray-900);
+  }
+  .section-action {
+    font-size: 12px; color: var(--blue);
+    cursor: pointer; font-weight: 500;
+    background: none; border: none;
+    padding: 4px 8px; border-radius: var(--radius-sm);
+    transition: background .12s;
+  }
+  .section-action:hover { background: var(--blue-lt); }
+
+  /* ── PROJECT MILESTONE CARDS ── */
+  .projects-stack { display: flex; flex-direction: column; gap: 14px; }
+
+  .project-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: box-shadow .15s;
+  }
+  .project-card:hover { box-shadow: var(--shadow-sm); }
+
+  .project-card-header {
+    display: flex; align-items: center;
+    padding: 14px 18px;
+    gap: 12px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .project-icon {
+    width: 36px; height: 36px;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+  .project-icon.solar { background: #fef9c3; color: #ca8a04; }
+  .project-icon.battery { background: var(--blue-lt); color: var(--blue); }
+  .project-icon.ev { background: var(--teal-lt); color: var(--teal); }
+  .project-icon.heatpump { background: var(--red-lt); color: var(--red); }
+
+  .project-meta { flex: 1; }
+  .project-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600; font-size: 14px;
+    color: var(--gray-900);
+  }
+  .project-detail { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+  .project-status-pill {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .psp-complete { background: var(--green-lt); color: var(--green); }
+  .psp-active   { background: var(--amber-lt); color: var(--amber); }
+  .psp-planned  { background: var(--gray-100); color: var(--gray-500); }
+
+  .project-card-body { padding: 16px 18px; }
+
+  /* milestone steps */
+  .milestone-track { display: flex; align-items: flex-start; gap: 0; }
+  .ms-step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+  .ms-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 12px; left: calc(50% + 13px);
+    width: calc(100% - 26px); height: 2px;
+    background: var(--gray-200);
+    z-index: 0;
+  }
+  .ms-step.done:not(:last-child)::after { background: var(--blue); }
+  .ms-step.partial:not(:last-child)::after {
+    background: linear-gradient(90deg, var(--blue) 50%, var(--gray-200) 50%);
+  }
+
+  .ms-dot {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600;
+    border: 2px solid var(--gray-200);
+    background: #fff;
+    color: var(--gray-400);
+    position: relative; z-index: 1;
+    flex-shrink: 0;
+  }
+  .ms-dot.done { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .ms-dot.active { background: #fff; border-color: var(--amber-mid); color: var(--amber-mid); }
+  .ms-dot.future { background: var(--gray-50); border-color: var(--gray-200); color: var(--gray-300); }
+
+  .ms-label { font-size: 10px; color: var(--gray-400); margin-top: 5px; text-align: center; }
+  .ms-label.done { color: var(--blue-dark); font-weight: 500; }
+  .ms-label.active { color: var(--amber); font-weight: 600; }
+
+  .ms-date { font-size: 9px; color: var(--gray-300); margin-top: 2px; text-align: center; }
+  .ms-date.done { color: var(--gray-400); }
+
+  /* ── DOCUMENTS SECTION ── */
+  .docs-controls {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .docs-filter {
+    display: flex; gap: 6px; flex: 1;
+  }
+  .filter-pill {
+    font-size: 11px; font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--gray-200);
+    background: #fff;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all .12s;
+  }
+  .filter-pill:hover { border-color: var(--blue); color: var(--blue); }
+  .filter-pill.active { background: var(--blue-lt); border-color: var(--blue); color: var(--blue); font-weight: 600; }
+
+  .upload-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    background: var(--blue);
+    color: #fff;
+    border: none; border-radius: var(--radius-md);
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    transition: background .12s;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .upload-btn:hover { background: var(--blue-dark); }
+
+  .docs-table-wrap {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .docs-table-header {
+    display: grid;
+    grid-template-columns: 32px 1fr 130px 120px 110px 80px;
+    gap: 0;
+    padding: 9px 16px;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .05em;
+    color: var(--gray-400);
+  }
+  .doc-row {
+    display: grid;
+    grid-template-columns: 32px 1fr 130px 120px 110px 80px;
+    gap: 0;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    align-items: center;
+    transition: background .1s;
+    cursor: pointer;
+  }
+  .doc-row:last-child { border-bottom: none; }
+  .doc-row:hover { background: var(--gray-50); }
+
+  .doc-file-icon {
+    width: 26px; height: 26px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; flex-shrink: 0;
+  }
+  .doc-file-icon.pdf  { background: #fef2f2; color: #dc2626; }
+  .doc-file-icon.img  { background: var(--blue-lt); color: var(--blue); }
+  .doc-file-icon.doc  { background: #eff6ff; color: #2563eb; }
+  .doc-file-icon.csv  { background: var(--green-lt); color: var(--green); }
+
+  .doc-name { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+  .doc-name-sub { font-size: 10px; color: var(--gray-400); margin-top: 1px; }
+
+  .doc-project-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 500;
+    padding: 3px 8px; border-radius: var(--radius-sm);
+  }
+  .dpt-solar   { background: #fef9c3; color: #854d0e; }
+  .dpt-battery { background: var(--blue-lt); color: var(--blue-dark); }
+  .dpt-ev      { background: var(--teal-lt); color: var(--teal); }
+  .dpt-contract{ background: var(--purple-lt); color: var(--purple); }
+
+  .doc-date { font-size: 12px; color: var(--gray-500); }
+
+  .doc-status-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 9px; border-radius: 20px;
+  }
+  .dsb-matched  { background: var(--green-lt); color: var(--green); }
+  .dsb-onfile   { background: var(--blue-lt); color: var(--blue-dark); }
+  .dsb-pending  { background: var(--amber-lt); color: var(--amber); }
+  .dsb-review   { background: var(--purple-lt); color: var(--purple); }
+
+  .doc-action {
+    background: none; border: none; cursor: pointer;
+    color: var(--gray-400); font-size: 13px;
+    padding: 4px 8px; border-radius: var(--radius-sm);
+    transition: all .12s;
+  }
+  .doc-action:hover { background: var(--gray-100); color: var(--gray-700); }
+
+  /* ── SOLEN AI WIDGET ── */
+  .solen-widget {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .solen-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--gray-100);
+    background: var(--blue-lt);
+  }
+  .solen-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .solen-title { font-weight: 600; font-size: 13px; color: var(--blue-dark); }
+  .solen-body { padding: 14px 18px; }
+  .solen-msg {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    font-size: 12px; color: var(--gray-700);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .solen-msg strong { color: var(--blue-dark); }
+  .solen-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .solen-chip {
+    font-size: 11px; color: var(--blue);
+    border: 1px solid var(--blue-mid);
+    border-radius: 20px; padding: 4px 10px;
+    cursor: pointer; background: var(--blue-lt);
+    transition: background .12s;
+    font-weight: 500;
+  }
+  .solen-chip:hover { background: var(--blue-mid); }
+
+  /* ── CREDIT SUMMARY ── */
+  .credit-summary {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .credit-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .credit-title { font-family:'Outfit',sans-serif; font-weight: 600; font-size: 15px; }
+  .credit-rows { padding: 6px 0; }
+  .credit-row {
+    display: flex; align-items: center;
+    padding: 10px 18px;
+    gap: 12px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .credit-row:last-child { border-bottom: none; }
+  .credit-code {
+    font-size: 11px; font-weight: 700;
+    font-family: 'IBM Plex Sans', sans-serif;
+    padding: 3px 8px; border-radius: var(--radius-sm);
+    background: var(--blue-lt); color: var(--blue-dark);
+    flex-shrink: 0; min-width: 60px; text-align: center;
+  }
+  .credit-desc { flex: 1; font-size: 12px; color: var(--gray-700); }
+  .credit-desc span { display: block; font-size: 10px; color: var(--gray-400); margin-top: 1px; }
+  .credit-amount {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--green);
+  }
+  .credit-status { font-size: 10px; font-weight: 600; color: var(--gray-400); }
+  .credit-total {
+    padding: 12px 18px;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .credit-total-label { font-size: 12px; font-weight: 600; color: var(--gray-700); }
+  .credit-total-val {
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px; font-weight: 700; color: var(--green);
+  }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
+  .one-col { display: flex; flex-direction: column; gap: 20px; }
+
+  /* ── FADE-IN ── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+  .page-content > * { animation: fadeUp .3s ease both; }
+  .page-content > *:nth-child(1) { animation-delay: .04s; }
+  .page-content > *:nth-child(2) { animation-delay: .08s; }
+  .page-content > *:nth-child(3) { animation-delay: .12s; }
+  .page-content > *:nth-child(4) { animation-delay: .16s; }
+
+  /* active filter logic */
+  .doc-row.hidden { display: none; }
+
+  /* ── LOADING SKELETONS ── */
+  .skel {
+    background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+    background-size: 200% 100%;
+    animation: skel-shimmer 1.4s infinite;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .skel-text { height: 14px; }
+  @keyframes skel-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; padding: 40px 20px; text-align: center;
+  }
+  .empty-state i { font-size: 32px; color: var(--gray-300); }
+  .empty-state-title { font-size: 14px; font-weight: 600; color: var(--gray-500); }
+  .empty-state-sub { font-size: 12px; color: var(--gray-400); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark"><i class="fa-solid fa-bolt"></i></div>
+    <div class="brand-text">
+      <div class="brand-name">Solenetec</div>
+      <div class="brand-sub">Client Portal</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">My Project</div>
+    <a class="nav-item active" href="portal-dashboard.html">
+      <i class="fa-solid fa-house-chimney"></i> Dashboard
+    </a>
+    <a class="nav-item" href="portal-dashboard.html#milestones">
+      <i class="fa-solid fa-list-check"></i> Project milestones
+    </a>
+    <a class="nav-item" href="portal-contracts.html">
+      <i class="fa-regular fa-file-lines"></i> Contracts
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Documents</div>
+    <a class="nav-item" href="portal-vault.html">
+      <i class="fa-solid fa-vault"></i> Document vault
+      <span class="badge-count">2</span>
+    </a>
+    <a class="nav-item" href="portal-vault.html?view=receipts">
+      <i class="fa-solid fa-receipt"></i> Receipts &amp; invoices
+    </a>
+    <a class="nav-item" href="portal-vault.html?view=credits">
+      <i class="fa-solid fa-file-invoice-dollar"></i> Tax credits
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Support</div>
+    <a class="nav-item" href="#solen">
+      <i class="fa-solid fa-robot"></i> Ask Solen AI
+    </a>
+    <a class="nav-item" href="YOUR_CALENDLY_URL" target="_blank">
+      <i class="fa-regular fa-calendar"></i> Schedule call
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="client-chip">
+      <div class="avatar">MJ</div>
+      <div>
+        <div class="client-name">Marcus Johnson</div>
+        <div class="client-role">Client since Jan 2025</div>
+      </div>
+      <button class="logout-btn" title="Sign out" onclick="handleSignOut()"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title">
+      Dashboard <span id="greeting">Good morning</span>
+    </div>
+    <span class="status-pill active" id="active-projects-pill">— Active Projects</span>
+    <div class="topbar-icon">
+      <i class="fa-regular fa-bell" style="font-size:14px"></i>
+      <span class="notif-dot"></span>
+    </div>
+    <div class="topbar-icon">
+      <i class="fa-regular fa-circle-question" style="font-size:14px"></i>
+    </div>
+  </div>
+
+  <!-- PAGE CONTENT -->
+  <div class="page-content">
+
+    <!-- STAT CARDS -->
+    <div class="stats-row">
+      <div class="stat-card accent">
+        <div class="stat-label">Total system size</div>
+        <div class="stat-value" id="stat-system-size"><span class="skel skel-text" style="width:80px"></span></div>
+        <div class="stat-sub blue" id="stat-system-sub"><span class="skel skel-text" style="width:60px"></span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Est. IRS credits</div>
+        <div class="stat-value" id="stat-credits"><span class="skel skel-text" style="width:80px"></span></div>
+        <div class="stat-sub green" id="stat-credits-sub"><span class="skel skel-text" style="width:60px"></span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Projects</div>
+        <div class="stat-value" id="stat-projects"><span class="skel skel-text" style="width:30px"></span></div>
+        <div class="stat-sub" id="stat-projects-sub"><span class="skel skel-text" style="width:80px"></span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Documents</div>
+        <div class="stat-value" id="stat-docs"><span class="skel skel-text" style="width:30px"></span></div>
+        <div class="stat-sub amber" id="stat-docs-sub"><span class="skel skel-text" style="width:80px"></span></div>
+      </div>
+    </div>
+
+    <!-- TWO-COL BODY -->
+    <div class="two-col">
+
+      <div class="one-col">
+
+        <!-- PROJECT MILESTONES -->
+        <div>
+          <div class="section-header">
+            <div class="section-title">Project milestones</div>
+            <button class="section-action">View all</button>
+          </div>
+          <div class="projects-stack" id="projects-container">
+            <!-- Loading skeleton -->
+            <div class="project-card" id="projects-skeleton">
+              <div class="project-card-header">
+                <div class="skel" style="width:36px;height:36px;border-radius:8px;flex-shrink:0"></div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                  <div class="skel skel-text" style="width:200px"></div>
+                  <div class="skel skel-text" style="width:280px;height:10px"></div>
+                </div>
+              </div>
+              <div class="project-card-body">
+                <div class="milestone-track">
+                  <div class="ms-step future"><div class="skel" style="width:28px;height:28px;border-radius:50%"></div><div class="skel skel-text" style="width:40px;margin-top:6px"></div></div>
+                  <div class="ms-step future"><div class="skel" style="width:28px;height:28px;border-radius:50%"></div><div class="skel skel-text" style="width:40px;margin-top:6px"></div></div>
+                  <div class="ms-step future"><div class="skel" style="width:28px;height:28px;border-radius:50%"></div><div class="skel skel-text" style="width:40px;margin-top:6px"></div></div>
+                  <div class="ms-step future"><div class="skel" style="width:28px;height:28px;border-radius:50%"></div><div class="skel skel-text" style="width:40px;margin-top:6px"></div></div>
+                  <div class="ms-step future"><div class="skel" style="width:28px;height:28px;border-radius:50%"></div><div class="skel skel-text" style="width:40px;margin-top:6px"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DOCUMENTS -->
+        <div>
+          <div class="section-header">
+            <div class="section-title">Documents</div>
+            <button class="upload-btn" onclick="window.location.href='portal-vault.html'"><i class="fa-solid fa-arrow-up-from-bracket"></i> Upload file</button>
+          </div>
+          <div class="docs-controls">
+            <div class="docs-filter">
+              <button class="filter-pill active" data-filter="all">All</button>
+              <button class="filter-pill" data-filter="solar">Solar</button>
+              <button class="filter-pill" data-filter="battery">Battery</button>
+              <button class="filter-pill" data-filter="ev">EV Charger</button>
+              <button class="filter-pill" data-filter="contract">Contracts</button>
+            </div>
+          </div>
+          <div class="docs-table-wrap">
+            <div class="docs-table-header">
+              <div></div>
+              <div>File</div>
+              <div>Project</div>
+              <div>Updated</div>
+              <div>Status</div>
+              <div></div>
+            </div>
+            <div id="docs-container">
+              <!-- Loading skeletons -->
+              <div class="doc-row" id="docs-skeleton">
+                <div class="skel" style="width:32px;height:32px;border-radius:7px"></div>
+                <div style="display:flex;flex-direction:column;gap:5px">
+                  <div class="skel skel-text" style="width:180px"></div>
+                  <div class="skel skel-text" style="width:120px;height:10px"></div>
+                </div>
+                <div class="skel skel-text" style="width:60px"></div>
+                <div class="skel skel-text" style="width:70px"></div>
+                <div class="skel skel-text" style="width:90px"></div>
+                <div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="one-col">
+
+        <!-- IRS CREDIT SUMMARY -->
+        <div class="credit-summary">
+          <div class="credit-header">
+            <div class="credit-title">IRS credit summary</div>
+            <button class="section-action">Full report</button>
+          </div>
+          <div class="credit-rows" id="credits-container">
+            <!-- Static IRS rows — always shown, amounts update dynamically -->
+            <div class="credit-row">
+              <div class="credit-code">§25D</div>
+              <div class="credit-desc">Residential clean energy<span>Solar panels · Battery storage · Homeowner-owned</span></div>
+              <div>
+                <div class="credit-amount" id="credit-25d-amt"><span class="skel skel-text" style="width:60px"></span></div>
+                <div class="credit-status" id="credit-25d-status"><span class="skel skel-text" style="width:50px;height:10px"></span></div>
+              </div>
+            </div>
+            <div class="credit-row">
+              <div class="credit-code">§25C</div>
+              <div class="credit-desc">Home improvement credit<span>Heat pump / water heater — if added</span></div>
+              <div>
+                <div class="credit-amount" id="credit-25c-amt" style="color:var(--gray-400)">—</div>
+                <div class="credit-status" id="credit-25c-status">Not yet filed</div>
+              </div>
+            </div>
+            <div class="credit-row">
+              <div class="credit-code">§30C</div>
+              <div class="credit-desc">EV refueling property<span>Pending — EV charger quote on file</span></div>
+              <div>
+                <div class="credit-amount" id="credit-30c-amt" style="color:var(--amber-mid)">—</div>
+                <div class="credit-status" id="credit-30c-status">Not filed</div>
+              </div>
+            </div>
+            <div class="credit-row">
+              <div class="credit-code">§48</div>
+              <div class="credit-desc">Commercial ITC<span>Applies if any system is business-owned</span></div>
+              <div>
+                <div class="credit-amount" style="color:var(--gray-400)">—</div>
+                <div class="credit-status">N/A — residential</div>
+              </div>
+            </div>
+          </div>
+          <div class="credit-total">
+            <div class="credit-total-label">Total estimated credits</div>
+            <div class="credit-total-val" id="credit-total">—</div>
+          </div>
+        </div>
+
+        <!-- SOLEN AI WIDGET -->
+        <div class="solen-widget">
+          <div class="solen-header">
+            <div class="solen-dot"></div>
+            <div class="solen-title">Solen — your project assistant</div>
+          </div>
+          <div class="solen-body">
+            <div class="solen-msg" id="solen-msg">
+              <span class="skel skel-text" style="width:100%;margin-bottom:6px"></span>
+              <span class="skel skel-text" style="width:85%"></span>
+            </div>
+            <div class="solen-chips" id="solen-chips"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ MFA ENROLLMENT MODAL ══════════════════════════════════ -->
+<style>
+.mfa-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+.mfa-modal-overlay.show{opacity:1;pointer-events:all}
+.mfa-modal{background:#fff;border-radius:16px;width:100%;max-width:520px;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.18);transform:scale(.97);transition:transform .25s cubic-bezier(.32,.72,0,1)}
+.mfa-modal-overlay.show .mfa-modal{transform:none}
+.mfa-modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px}
+.mfa-modal-icon{width:40px;height:40px;border-radius:10px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mfa-modal-icon i{color:var(--blue);font-size:17px}
+.mfa-modal-title{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:var(--gray-900)}
+.mfa-modal-sub{font-size:12px;color:var(--gray-400);margin-top:2px}
+.mfa-modal-body{padding:24px;display:flex;flex-direction:column;gap:16px}
+.mfa-step{display:none;flex-direction:column;gap:14px}
+.mfa-step.active{display:flex}
+.mfa-step-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);margin-bottom:2px}
+.mfa-desc{font-size:13px;color:var(--gray-600);line-height:1.6}
+.mfa-qr-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:20px}
+.mfa-qr-wrap img{width:180px;height:180px;border-radius:8px}
+.mfa-secret-box{background:var(--gray-100);border:1px solid var(--gray-200);border-radius:7px;padding:10px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--gray-800);text-align:center;letter-spacing:.08em;word-break:break-all;cursor:pointer;transition:background .12s}
+.mfa-secret-box:hover{background:var(--blue-lt)}
+.mfa-secret-label{font-size:11px;color:var(--gray-400);text-align:center}
+.mfa-otp-row{display:flex;gap:6px}
+.mfa-otp-input{flex:1;height:48px;border:1px solid var(--gray-200);border-radius:8px;text-align:center;font-size:20px;font-weight:600;font-family:'Outfit',sans-serif;color:var(--gray-900);background:var(--gray-50);outline:none;transition:border-color .15s,box-shadow .15s;min-width:0}
+.mfa-otp-input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,86,219,.1)}
+.mfa-otp-input.filled{border-color:var(--blue);background:var(--blue-lt);color:var(--blue-dark)}
+.mfa-error{background:var(--red-lt);border:1px solid #fecaca;border-radius:7px;padding:9px 13px;font-size:12px;color:var(--red);display:none;align-items:center;gap:7px}
+.mfa-error.show{display:flex}
+.mfa-primary-btn{width:100%;height:44px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+.mfa-primary-btn:hover{background:var(--blue-dark)}
+.mfa-primary-btn:disabled{background:var(--gray-300);cursor:not-allowed}
+.mfa-skip{font-size:12px;color:var(--gray-400);text-align:center;cursor:pointer;background:none;border:none;font-family:inherit;padding:4px}
+.mfa-skip:hover{color:var(--gray-600)}
+.mfa-success-icon{width:60px;height:60px;background:var(--green-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto}
+.mfa-success-icon i{color:var(--green);font-size:24px}
+.mfa-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:mfa-spin .7s linear infinite;display:none}
+@keyframes mfa-spin{to{transform:rotate(360deg)}}
+
+/* MFA banner for skipped users */
+.mfa-banner{display:none;background:var(--amber-lt);border:1px solid #fde68a;border-radius:10px;padding:12px 16px;margin:0 28px 0;align-items:center;gap:12px}
+.mfa-banner.show{display:flex}
+.mfa-banner i{color:var(--amber-mid);font-size:16px;flex-shrink:0}
+.mfa-banner-text{flex:1;font-size:12px;color:var(--amber);line-height:1.5}
+.mfa-banner-btn{font-size:12px;font-weight:600;color:var(--amber);background:none;border:1px solid var(--amber-mid);border-radius:6px;padding:5px 12px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .12s}
+.mfa-banner-btn:hover{background:rgba(245,158,11,.1)}
+</style>
+
+<div class="mfa-modal-overlay" id="mfa-enroll-overlay">
+  <div class="mfa-modal">
+    <div class="mfa-modal-header">
+      <div class="mfa-modal-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <div>
+        <div class="mfa-modal-title">Set up two-factor authentication</div>
+        <div class="mfa-modal-sub">Required to access your secure document vault</div>
+      </div>
+    </div>
+    <div class="mfa-modal-body">
+
+      <!-- Step 1: Install app -->
+      <div class="mfa-step active" id="mfa-step-1">
+        <div class="mfa-step-label">Step 1 of 3 — Install authenticator app</div>
+        <div class="mfa-desc">Two-factor authentication protects your financial documents and IRS credit records. You'll need an authenticator app on your phone.</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:10px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px 14px">
+            <i class="fa-brands fa-google" style="color:#4285F4;font-size:18px;width:24px;text-align:center"></i>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--gray-800)">Google Authenticator</div>
+              <div style="font-size:11px;color:var(--gray-400)">Available on iOS and Android — free</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px 14px">
+            <i class="fa-solid fa-key" style="color:#F59E0B;font-size:16px;width:24px;text-align:center"></i>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--gray-800)">Authy or 1Password</div>
+              <div style="font-size:11px;color:var(--gray-400)">Also compatible — any TOTP app works</div>
+            </div>
+          </div>
+        </div>
+        <button class="mfa-primary-btn" onclick="mfaGoStep2()">
+          <i class="fa-solid fa-arrow-right"></i> I have an authenticator app
+        </button>
+        <button class="mfa-skip" onclick="mfaSkip()">Remind me later</button>
+      </div>
+
+      <!-- Step 2: Scan QR -->
+      <div class="mfa-step" id="mfa-step-2">
+        <div class="mfa-step-label">Step 2 of 3 — Scan QR code</div>
+        <div class="mfa-desc">Open your authenticator app, tap <strong>+</strong> or <strong>Add account</strong>, then scan the QR code below.</div>
+        <div class="mfa-qr-wrap">
+          <div id="mfa-qr-loading" style="width:180px;height:180px;display:flex;align-items:center;justify-content:center;background:var(--gray-100);border-radius:8px">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:var(--gray-400)"></i>
+          </div>
+          <img id="mfa-qr-image" src="" alt="QR Code" style="display:none;width:180px;height:180px;border-radius:8px"/>
+          <div style="font-size:11px;color:var(--gray-500);text-align:center">Can't scan? Enter the key manually instead</div>
+        </div>
+        <div>
+          <div class="mfa-secret-label" style="margin-bottom:5px">Or enter this key manually in your app:</div>
+          <div class="mfa-secret-box" id="mfa-secret-display" onclick="copySecret()" title="Click to copy">Loading…</div>
+          <div class="mfa-secret-label" style="margin-top:4px">Click to copy · Account name: Solenetec Portal</div>
+        </div>
+        <button class="mfa-primary-btn" onclick="mfaGoStep3()">
+          <i class="fa-solid fa-arrow-right"></i> I've scanned the code
+        </button>
+      </div>
+
+      <!-- Step 3: Verify -->
+      <div class="mfa-step" id="mfa-step-3">
+        <div class="mfa-step-label">Step 3 of 3 — Verify setup</div>
+        <div class="mfa-desc">Enter the 6-digit code from your authenticator app to confirm setup is working correctly.</div>
+        <div class="mfa-otp-row" id="mfa-verify-inputs">
+          <input class="mfa-otp-input" id="mv-0" maxlength="1" inputmode="numeric"/>
+          <input class="mfa-otp-input" id="mv-1" maxlength="1" inputmode="numeric"/>
+          <input class="mfa-otp-input" id="mv-2" maxlength="1" inputmode="numeric"/>
+          <input class="mfa-otp-input" id="mv-3" maxlength="1" inputmode="numeric"/>
+          <input class="mfa-otp-input" id="mv-4" maxlength="1" inputmode="numeric"/>
+          <input class="mfa-otp-input" id="mv-5" maxlength="1" inputmode="numeric"/>
+        </div>
+        <div class="mfa-error" id="mfa-verify-error">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>Incorrect code. Please check your authenticator app and try again.</span>
+        </div>
+        <button class="mfa-primary-btn" id="mfa-verify-btn" onclick="mfaVerify()">
+          <span class="mfa-spinner" id="mfa-verify-spinner"></span>
+          <span id="mfa-verify-btn-text"><i class="fa-solid fa-shield-halved"></i> Activate two-factor auth</span>
+        </button>
+      </div>
+
+      <!-- Step 4: Success -->
+      <div class="mfa-step" id="mfa-step-4">
+        <div class="mfa-success-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div style="text-align:center">
+          <div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;color:var(--gray-900);margin-bottom:6px">Two-factor auth enabled!</div>
+          <div style="font-size:13px;color:var(--gray-500);line-height:1.6">Your account and documents are now protected. You'll be asked for a code each time you access the document vault.</div>
+        </div>
+        <button class="mfa-primary-btn" onclick="mfaDone()">
+          <i class="fa-solid fa-check"></i> Done — take me to my dashboard
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MFA reminder banner (shown when skipped) -->
+<div class="mfa-banner" id="mfa-banner">
+  <i class="fa-solid fa-triangle-exclamation"></i>
+  <div class="mfa-banner-text"><strong>Two-factor auth not set up.</strong> Your document vault requires MFA to access. Set it up to unlock your vault and protect your documents.</div>
+  <button class="mfa-banner-btn" onclick="showMFAModal()">Set up now</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  // ── Sign out ─────────────────────────────────────────────────
+  async function handleSignOut() {
+    try {
+      await _sb.auth.signOut();
+    } catch(e) {
+      console.log('Sign out error:', e.message);
+    } finally {
+      sessionStorage.clear();
+      localStorage.removeItem('solenetec_portal_session');
+      window.location.href = 'portal-login.html';
+    }
+  }
+
+  // ── Filter pills ─────────────────────────────────────────────
+  document.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.addEventListener('click', function() {
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      const filter = this.dataset.filter;
+      document.querySelectorAll('.doc-row').forEach(row => {
+        if (filter === 'all' || row.dataset.project === filter) {
+          row.classList.remove('hidden');
+        } else {
+          row.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // ── Supabase setup ───────────────────────────────────────────
+  const SUPABASE_URL      = 'YOUR_SUPABASE_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+  const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, storageKey: 'solenetec_portal_session' }
+  });
+
+  // ── Helpers ──────────────────────────────────────────────────
+  function greeting() {
+    const h = new Date().getHours();
+    return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  }
+
+  function fmt(d) {
+    if (!d) return 'TBD';
+    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function fmtShort(d) {
+    if (!d) return 'TBD';
+    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  function fmtMoney(n) {
+    if (!n && n !== 0) return '—';
+    return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 0 });
+  }
+
+  function projectTypeIcon(type) {
+    const map = {
+      solar: { cls: 'solar', icon: 'fa-sun' },
+      battery: { cls: 'battery', icon: 'fa-battery-three-quarters' },
+      ev: { cls: 'ev', icon: 'fa-charging-station' },
+      hvac: { cls: 'solar', icon: 'fa-wind' },
+    };
+    return map[type] || { cls: 'solar', icon: 'fa-bolt' };
+  }
+
+  function statusPill(status) {
+    const map = {
+      complete:    { cls: 'psp-complete', label: 'Complete' },
+      in_progress: { cls: 'psp-active',   label: 'In Progress' },
+      planned:     { cls: 'psp-planned',  label: 'Planned' },
+      on_hold:     { cls: 'psp-planned',  label: 'On Hold' },
+    };
+    return map[status] || { cls: 'psp-planned', label: status };
+  }
+
+  function docIcon(mime) {
+    if (!mime) return { cls: 'pdf', icon: 'fa-file' };
+    if (mime.includes('pdf'))  return { cls: 'pdf', icon: 'fa-file-pdf' };
+    if (mime.includes('image')) return { cls: 'img', icon: 'fa-image' };
+    if (mime.includes('word') || mime.includes('document')) return { cls: 'doc', icon: 'fa-file-word' };
+    if (mime.includes('sheet') || mime.includes('excel')) return { cls: 'doc', icon: 'fa-file-excel' };
+    return { cls: 'pdf', icon: 'fa-file' };
+  }
+
+  function docStatusBadge(status, irc_code) {
+    if (status === 'matched' && irc_code)
+      return `<span class="doc-status-badge dsb-matched"><i class="fa-solid fa-circle-check" style="font-size:9px"></i> ${irc_code} matched</span>`;
+    if (status === 'pending')
+      return `<span class="doc-status-badge dsb-pending"><i class="fa-solid fa-clock" style="font-size:9px"></i> Pending review</span>`;
+    if (status === 'rejected')
+      return `<span class="doc-status-badge" style="background:#fef2f2;color:#dc2626"><i class="fa-solid fa-xmark" style="font-size:9px"></i> Rejected</span>`;
+    return `<span class="doc-status-badge dsb-onfile"><i class="fa-solid fa-folder" style="font-size:9px"></i> On file</span>`;
+  }
+
+  function docProjectTag(type) {
+    const map = {
+      solar:   { cls: 'dpt-solar',    icon: 'fa-sun',               label: 'Solar' },
+      battery: { cls: 'dpt-battery',  icon: 'fa-battery-three-quarters', label: 'Battery' },
+      ev:      { cls: 'dpt-ev',       icon: 'fa-charging-station',  label: 'EV Charger' },
+      contract:{ cls: 'dpt-contract', icon: 'fa-file-signature',    label: 'Contract' },
+    };
+    const t = map[type] || { cls: 'dpt-contract', icon: 'fa-file', label: type || 'General' };
+    return `<span class="doc-project-tag ${t.cls}"><i class="fa-solid ${t.icon}" style="font-size:9px"></i> ${t.label}</span>`;
+  }
+
+  // ── Milestone renderer ───────────────────────────────────────
+  function renderMilestones(milestones) {
+    const labels = ['Design', 'Permit', 'Install', 'Inspection', 'PTO'];
+    // Sort by step number
+    const sorted = [...milestones].sort((a, b) => (a.step || 0) - (b.step || 0));
+
+    return [1, 2, 3, 4, 5].map((stepNum, i) => {
+      const ms = sorted.find(m => m.step === stepNum) || sorted[i];
+      const completed = ms?.completed_at;
+      const isActive  = ms?.status === 'in_progress';
+      const label     = ms?.label || labels[i];
+
+      let state, dotHtml, labelCls, dateTxt;
+
+      if (completed || ms?.status === 'complete') {
+        state = 'done';
+        dotHtml = `<i class="fa-solid fa-check" style="font-size:8px"></i>`;
+        labelCls = 'done';
+        dateTxt = completed ? fmtShort(completed) : '✓';
+      } else if (isActive) {
+        state = 'active';
+        dotHtml = `<i class="fa-solid fa-screwdriver-wrench" style="font-size:8px"></i>`;
+        labelCls = 'active';
+        dateTxt = ms?.notes || 'In progress';
+      } else {
+        state = 'future';
+        dotHtml = `${stepNum}`;
+        labelCls = '';
+        dateTxt = 'TBD';
+      }
+
+      return `
+        <div class="ms-step ${state}">
+          <div class="ms-dot ${state}">${dotHtml}</div>
+          <div class="ms-label ${labelCls}">${label}</div>
+          <div class="ms-date ${state === 'done' ? 'done' : ''}">${dateTxt}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Project card renderer ────────────────────────────────────
+  function renderProject(project, milestones) {
+    const { cls, icon } = projectTypeIcon(project.project_type);
+    const { cls: sCls, label: sLabel } = statusPill(project.status);
+    const detail = [
+      project.system_size || null,
+      project.equipment || null,
+      project.start_date ? `Started ${new Date(project.start_date).toLocaleDateString('en-US', {month:'short', year:'numeric'})}` : null,
+      project.install_address || null
+    ].filter(Boolean).join(' · ');
+
+    return `
+      <div class="project-card">
+        <div class="project-card-header">
+          <div class="project-icon ${cls}"><i class="fa-solid ${icon}"></i></div>
+          <div class="project-meta">
+            <div class="project-name">${project.name || 'Untitled Project'}</div>
+            <div class="project-detail">${detail || 'Details pending'}</div>
+          </div>
+          <span class="project-status-pill ${sCls}">${sLabel}</span>
+        </div>
+        <div class="project-card-body">
+          <div class="milestone-track">
+            ${renderMilestones(milestones.filter(m => m.project_id === project.id))}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // ── Document row renderer ────────────────────────────────────
+  function renderDoc(doc) {
+    const { cls, icon } = docIcon(doc.mime_type);
+    const projectType = doc.projects?.project_type || 'contract';
+    const sub = [
+      doc.amount ? fmtMoney(doc.amount) : null,
+      doc.vendor || null
+    ].filter(Boolean).join(' · ');
+
+    return `
+      <div class="doc-row" data-project="${projectType}">
+        <div class="doc-file-icon ${cls}"><i class="fa-solid ${icon}"></i></div>
+        <div>
+          <div class="doc-name">${doc.file_name || 'Untitled document'}</div>
+          <div class="doc-name-sub">${sub || doc.description || '—'}</div>
+        </div>
+        ${docProjectTag(projectType)}
+        <div class="doc-date">${fmt(doc.uploaded_at || doc.created_at)}</div>
+        ${docStatusBadge(doc.classification_status, doc.irc_code)}
+        <button class="doc-action"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>`;
+  }
+
+  // ── Update sidebar client chip ───────────────────────────────
+  function updateClientChip(client, user) {
+    const name = client?.full_name || user?.user_metadata?.full_name || 'Client';
+    const firstName = name.split(' ')[0];
+    const initials = name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+    const since = client?.created_at
+      ? 'Client since ' + new Date(client.created_at).toLocaleDateString('en-US', {month:'short', year:'numeric'})
+      : 'Solenetec Client';
+
+    document.querySelector('.avatar').textContent = initials;
+    document.querySelector('.client-name').textContent = name;
+    document.querySelector('.client-role').textContent = since;
+    document.getElementById('greeting').textContent = `${greeting()}, ${firstName}`;
+  }
+
+  // ── IRS credits from documents ───────────────────────────────
+  function updateCredits(docs) {
+    let total25D = 0, total30C = 0, matched25D = 0;
+
+    docs.forEach(doc => {
+      if (doc.irc_code === '25D' && doc.classification_status === 'matched') {
+        total25D += (doc.amount || 0) * 0.30;
+        matched25D++;
+      }
+      if (doc.irc_code === '30C' && doc.classification_status === 'matched') {
+        total30C += (doc.amount || 0) * 0.30;
+      }
+    });
+
+    if (total25D > 0) {
+      document.getElementById('credit-25d-amt').textContent = fmtMoney(Math.round(total25D));
+      document.getElementById('credit-25d-status').textContent = `30% · ${matched25D} doc${matched25D !== 1 ? 's' : ''} matched`;
+    } else {
+      document.getElementById('credit-25d-amt').textContent = '—';
+      document.getElementById('credit-25d-amt').style.color = 'var(--gray-400)';
+      document.getElementById('credit-25d-status').textContent = 'No docs matched yet';
+    }
+
+    if (total30C > 0) {
+      document.getElementById('credit-30c-amt').textContent = '~' + fmtMoney(Math.round(total30C));
+      document.getElementById('credit-30c-status').textContent = 'Estimated';
+    } else {
+      document.getElementById('credit-30c-amt').textContent = '—';
+      document.getElementById('credit-30c-status').textContent = 'Not filed';
+    }
+
+    const grandTotal = total25D + total30C;
+    document.getElementById('credit-total').textContent = grandTotal > 0 ? fmtMoney(Math.round(grandTotal)) : '—';
+  }
+
+  // ── Solen AI message ─────────────────────────────────────────
+  function updateSolen(client, projects, docs) {
+    const firstName = (client?.full_name || 'there').split(' ')[0];
+    const activeProject = projects.find(p => p.status === 'in_progress');
+    const matchedDocs = docs.filter(d => d.classification_status === 'matched').length;
+    const pendingDocs = docs.filter(d => d.classification_status === 'pending').length;
+
+    let msg = `Hi ${firstName}! `;
+    const chips = [];
+
+    if (activeProject) {
+      msg += `Your <strong>${activeProject.name}</strong> project is currently in progress. `;
+      chips.push('Project status');
+    }
+    if (matchedDocs > 0) {
+      msg += `I've matched <strong>${matchedDocs} document${matchedDocs !== 1 ? 's' : ''}</strong> to IRS credits so far. `;
+      chips.push('View credits');
+    }
+    if (pendingDocs > 0) {
+      msg += `You have <strong>${pendingDocs} document${pendingDocs !== 1 ? 's' : ''}</strong> pending review in your vault. `;
+      chips.push('Review docs');
+    }
+    if (!activeProject && !matchedDocs) {
+      msg += `Welcome to your Solenetec portal. Upload receipts to the vault to start matching your IRS credits automatically.`;
+      chips.push('Upload documents');
+    }
+    chips.push('Talk to Solen');
+
+    document.getElementById('solen-msg').innerHTML = msg;
+    document.getElementById('solen-chips').innerHTML = chips
+      .map(c => `<span class="solen-chip">${c}</span>`).join('');
+  }
+
+  // ── Main data loader ─────────────────────────────────────────
+  window.addEventListener('load', async () => {
+    try {
+      // 1. Verify session
+      const { data: { session } } = await _sb.auth.getSession();
+      if (!session) { window.location.href = 'portal-login.html'; return; }
+
+      const userId = session.user.id;
+
+      // 2. Fetch client record
+      const { data: client } = await _sb.from('clients')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      // 3. Update greeting and sidebar
+      updateClientChip(client, session.user);
+
+      // 4. Fetch projects with milestones
+      const { data: projects } = await _sb.from('projects')
+        .select('*, milestones(id, project_id, step, label, status, completed_at, notes)')
+        .eq('client_id', userId)
+        .order('start_date', { ascending: true });
+
+      const allMilestones = projects?.flatMap(p => p.milestones || []) || [];
+
+      // 5. Render projects
+      const container = document.getElementById('projects-container');
+      document.getElementById('projects-skeleton')?.remove();
+
+      if (!projects || projects.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-solar-panel"></i>
+            <div class="empty-state-title">No projects yet</div>
+            <div class="empty-state-sub">Your installation projects will appear here once Alex sets them up in your account.</div>
+          </div>`;
+      } else {
+        container.innerHTML = projects.map(p =>
+          renderProject(p, allMilestones)
+        ).join('');
+      }
+
+      // 6. Update stat cards
+      const total = projects?.length || 0;
+      const complete = projects?.filter(p => p.status === 'complete').length || 0;
+      const active = projects?.filter(p => p.status === 'in_progress').length || 0;
+      const totalKw = projects?.reduce((sum, p) => sum + (parseFloat(p.system_size) || 0), 0) || 0;
+      const projectTypes = [...new Set(projects?.map(p => p.project_type) || [])];
+
+      document.getElementById('stat-projects').textContent = total || '—';
+      document.getElementById('stat-projects-sub').textContent =
+        total ? `${complete} complete · ${active} active` : 'No projects yet';
+      document.getElementById('stat-system-size').textContent =
+        totalKw ? `${totalKw} kW` : projects?.[0]?.system_size || '—';
+      document.getElementById('stat-system-sub').textContent =
+        projectTypes.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(' + ') || '—';
+
+      // Update active projects pill
+      document.getElementById('active-projects-pill').textContent =
+        `${active} Active Project${active !== 1 ? 's' : ''}`;
+
+      // 7. Fetch documents
+      const { data: docs } = await _sb.from('documents')
+        .select('*, projects(project_type)')
+        .eq('client_id', userId)
+        .order('uploaded_at', { ascending: false });
+
+      // 8. Render documents
+      const docsContainer = document.getElementById('docs-container');
+      document.getElementById('docs-skeleton')?.remove();
+
+      const pending = docs?.filter(d => d.classification_status === 'pending').length || 0;
+      const matched = docs?.filter(d => d.classification_status === 'matched').length || 0;
+
+      document.getElementById('stat-docs').textContent = docs?.length || '0';
+      document.getElementById('stat-docs-sub').textContent =
+        pending > 0 ? `${pending} pending review` : matched > 0 ? `${matched} matched` : 'No documents yet';
+
+      if (!docs || docs.length === 0) {
+        docsContainer.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-file-arrow-up"></i>
+            <div class="empty-state-title">No documents yet</div>
+            <div class="empty-state-sub">Upload receipts and permits to the Document Vault to start matching IRS credits automatically.</div>
+          </div>`;
+      } else {
+        docsContainer.innerHTML = docs.map(renderDoc).join('');
+        // Re-attach filter pill listeners after dynamic render
+        document.querySelectorAll('.filter-pill').forEach(pill => {
+          pill.addEventListener('click', function() {
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            const filter = this.dataset.filter;
+            document.querySelectorAll('.doc-row').forEach(row => {
+              row.classList.toggle('hidden', filter !== 'all' && row.dataset.project !== filter);
+            });
+          });
+        });
+      }
+
+      // 9. Update IRS credits
+      updateCredits(docs || []);
+
+      // 10. Update Solen message
+      updateSolen(client, projects || [], docs || []);
+
+      // 11. IRS credits stat card
+      const totalCredits = (docs || []).reduce((sum, d) => {
+        if (d.classification_status === 'matched' && d.amount) {
+          return sum + (d.amount * 0.30);
+        }
+        return sum;
+      }, 0);
+      document.getElementById('stat-credits').textContent =
+        totalCredits > 0 ? fmtMoney(Math.round(totalCredits)) : '—';
+      document.getElementById('stat-credits-sub').textContent =
+        matched > 0 ? `${matched} doc${matched !== 1 ? 's' : ''} matched` : 'Upload docs to match';
+
+    } catch(err) {
+      console.error('Dashboard load error:', err.message);
+    }
+  });
+
+  // ── MFA state ────────────────────────────────────────────────
+  let _factorId     = null;
+  let _challengeId  = null;
+  let _mfaSecret    = null;
+
+  // ── On load: check if MFA is enrolled ───────────────────────
+  window.addEventListener('load', async () => {
+    try {
+      const { data: { session } } = await _sb.auth.getSession();
+      if (!session) {
+        window.location.href = 'portal-login.html';
+        return;
+      }
+
+      // Check enrolled factors
+      const { data: factors } = await _sb.auth.mfa.listFactors();
+      const enrolled = factors?.totp?.length > 0;
+
+      if (!enrolled) {
+        // Check if user already skipped this session
+        const skipped = sessionStorage.getItem('mfa_setup_skipped');
+        if (skipped) {
+          document.getElementById('mfa-banner').classList.add('show');
+        } else {
+          // Show enrollment modal after short delay
+          setTimeout(() => showMFAModal(), 800);
+        }
+      }
+    } catch(e) {
+      console.log('Session check:', e.message);
+    }
+  });
+
+  // ── Modal controls ───────────────────────────────────────────
+  function showMFAModal() {
+    document.getElementById('mfa-banner').classList.remove('show');
+    document.getElementById('mfa-enroll-overlay').classList.add('show');
+  }
+
+  function mfaGoStep(n) {
+    document.querySelectorAll('.mfa-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('mfa-step-' + n).classList.add('active');
+  }
+
+  // ── Step 2: Generate QR code ─────────────────────────────────
+  async function mfaGoStep2() {
+    mfaGoStep(2);
+    try {
+      const { data, error } = await _sb.auth.mfa.enroll({
+        factorType: 'totp',
+        friendlyName: 'Authenticator App'
+      });
+      if (error) throw error;
+
+      _factorId  = data.id;
+      _mfaSecret = data.totp.secret;
+
+      // Show QR code image
+      const qrLoading = document.getElementById('mfa-qr-loading');
+      const qrImage   = document.getElementById('mfa-qr-image');
+      qrImage.src = data.totp.qr_code;
+      qrImage.onload = () => {
+        qrLoading.style.display = 'none';
+        qrImage.style.display = 'block';
+      };
+
+      // Show secret in readable chunks
+      const secret = data.totp.secret;
+      const chunked = secret.match(/.{1,4}/g)?.join(' ') || secret;
+      document.getElementById('mfa-secret-display').textContent = chunked;
+
+    } catch(e) {
+      alert('Error generating QR code: ' + e.message);
+      mfaGoStep(1);
+    }
+  }
+
+  function mfaGoStep3() {
+    mfaGoStep(3);
+    setTimeout(() => document.getElementById('mv-0').focus(), 100);
+  }
+
+  // ── OTP inputs for verification ──────────────────────────────
+  const mvInputs = document.querySelectorAll('[id^="mv-"]');
+  mvInputs.forEach((inp, i) => {
+    inp.addEventListener('input', function() {
+      this.value = this.value.replace(/\D/g, '');
+      if (this.value) {
+        this.classList.add('filled');
+        if (i < 5) mvInputs[i+1].focus();
+      } else {
+        this.classList.remove('filled');
+      }
+    });
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' && !this.value && i > 0) {
+        mvInputs[i-1].focus();
+        mvInputs[i-1].value = '';
+        mvInputs[i-1].classList.remove('filled');
+      }
+    });
+    inp.addEventListener('paste', function(e) {
+      e.preventDefault();
+      const paste = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      paste.split('').forEach((ch, j) => {
+        if (mvInputs[j]) { mvInputs[j].value = ch; mvInputs[j].classList.add('filled'); }
+      });
+      if (paste.length === 6) mfaVerify();
+    });
+  });
+
+  // ── Verify TOTP code ─────────────────────────────────────────
+  async function mfaVerify() {
+    const code = Array.from(mvInputs).map(i => i.value).join('');
+    if (code.length < 6) return;
+
+    const btn     = document.getElementById('mfa-verify-btn');
+    const spinner = document.getElementById('mfa-verify-spinner');
+    const btnText = document.getElementById('mfa-verify-btn-text');
+    const errEl   = document.getElementById('mfa-verify-error');
+    errEl.classList.remove('show');
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = 'Verifying…';
+
+    try {
+      // Create challenge
+      const { data: challenge, error: cErr } = await _sb.auth.mfa.challenge({ factorId: _factorId });
+      if (cErr) throw cErr;
+
+      // Verify code
+      const { error: vErr } = await _sb.auth.mfa.verify({
+        factorId:    _factorId,
+        challengeId: challenge.id,
+        code
+      });
+      if (vErr) throw vErr;
+
+      // Success
+      mfaGoStep(4);
+
+    } catch(e) {
+      errEl.classList.add('show');
+      mvInputs.forEach(i => { i.value = ''; i.classList.remove('filled'); });
+      mvInputs[0].focus();
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Activate two-factor auth';
+    }
+  }
+
+  // ── Skip MFA ─────────────────────────────────────────────────
+  function mfaSkip() {
+    sessionStorage.setItem('mfa_setup_skipped', 'true');
+    document.getElementById('mfa-enroll-overlay').classList.remove('show');
+    document.getElementById('mfa-banner').classList.add('show');
+  }
+
+  // ── Done ─────────────────────────────────────────────────────
+  function mfaDone() {
+    document.getElementById('mfa-enroll-overlay').classList.remove('show');
+    sessionStorage.removeItem('mfa_setup_skipped');
+  }
+
+  // ── Copy secret ──────────────────────────────────────────────
+  function copySecret() {
+    if (_mfaSecret) {
+      navigator.clipboard.writeText(_mfaSecret).then(() => {
+        const el = document.getElementById('mfa-secret-display');
+        const orig = el.textContent;
+        el.textContent = 'Copied!';
+        el.style.color = 'var(--green)';
+        setTimeout(() => { el.textContent = orig; el.style.color = ''; }, 1500);
+      });
+    }
+  }
+</script>
+</body>
+</html>

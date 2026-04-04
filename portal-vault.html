@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Solenetec Client Portal — Document Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root {
+  --blue:       #1a56db;
+  --blue-lt:    #eff4ff;
+  --blue-mid:   #dbeafe;
+  --blue-dark:  #1e40af;
+  --green:      #15803d;
+  --green-lt:   #dcfce7;
+  --green-mid:  #bbf7d0;
+  --amber:      #92400e;
+  --amber-lt:   #fef3c7;
+  --amber-mid:  #f59e0b;
+  --red:        #dc2626;
+  --red-lt:     #fef2f2;
+  --purple:     #7c3aed;
+  --purple-lt:  #f5f3ff;
+  --teal:       #0d9488;
+  --teal-lt:    #f0fdfa;
+  --gray-50:    #f7f8fa;
+  --gray-100:   #f0f2f5;
+  --gray-200:   #e8eaed;
+  --gray-300:   #d1d5db;
+  --gray-400:   #9ca3af;
+  --gray-500:   #6b7280;
+  --gray-700:   #374151;
+  --gray-800:   #1f2937;
+  --gray-900:   #111827;
+  --sidebar-w:  220px;
+  --topbar-h:   56px;
+  --session-ttl: 900; /* 15 min in seconds */
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh;display:flex;font-size:14px}
+
+/* ── SIDEBAR (same as dashboard) ── */
+.sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sidebar-brand{padding:18px 16px 14px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:10px}
+.brand-mark{width:32px;height:32px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.brand-mark i{color:#fff;font-size:14px}
+.brand-name{font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;color:var(--gray-900)}
+.brand-sub{font-size:10px;color:var(--gray-400);margin-top:1px}
+.sidebar-section{padding:12px 8px 4px}
+.sidebar-section-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--gray-400);padding:0 8px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--gray-500);cursor:pointer;transition:background .12s,color .12s;text-decoration:none;margin:1px 0}
+.nav-item i{width:16px;text-align:center;font-size:13px;flex-shrink:0}
+.nav-item:hover{background:var(--gray-100);color:var(--gray-800)}
+.nav-item.active{background:var(--blue-lt);color:var(--blue);font-weight:500}
+.sidebar-footer{margin-top:auto;padding:12px 8px;border-top:1px solid var(--gray-200)}
+.client-chip{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:var(--gray-50);border:1px solid var(--gray-200)}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--blue-mid);color:var(--blue-dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.client-name{font-size:12px;font-weight:500;color:var(--gray-800)}
+.client-role{font-size:10px;color:var(--gray-400)}
+.logout-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px;padding:4px;border-radius:4px;transition:color .12s}
+.logout-btn:hover{color:var(--red)}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{height:var(--topbar-h);background:#fff;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;padding:0 28px;gap:14px;position:sticky;top:0;z-index:50}
+.topbar-title{font-family:'Outfit',sans-serif;font-weight:600;font-size:17px;color:var(--gray-900);flex:1}
+.topbar-title span{color:var(--gray-400);font-weight:400;font-size:13px;margin-left:8px}
+.topbar-icon{width:34px;height:34px;border-radius:8px;border:1px solid var(--gray-200);display:flex;align-items:center;justify-content:center;color:var(--gray-500);cursor:pointer;transition:background .12s;position:relative}
+.topbar-icon:hover{background:var(--gray-100)}
+.session-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--green-lt);color:var(--green);border:1px solid var(--green-mid)}
+.session-badge i{font-size:10px}
+.session-badge.expiring{background:var(--amber-lt);color:var(--amber);border-color:#fde68a;animation:pulse-amber 1.5s ease-in-out infinite}
+@keyframes pulse-amber{0%,100%{opacity:1}50%{opacity:.7}}
+
+/* ── PAGE ── */
+.page-content{padding:28px;display:flex;flex-direction:column;gap:24px}
+
+/* ── MFA GATE ── */
+.mfa-gate{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:0}
+.mfa-gate.show{display:flex}
+.mfa-gate-card{background:#fff;border:1px solid var(--gray-200);border-radius:16px;padding:40px 44px;max-width:480px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0}
+.mfa-gate-icon{width:60px;height:60px;background:var(--blue-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.mfa-gate-icon i{font-size:24px;color:var(--blue)}
+.mfa-gate-title{font-family:'Outfit',sans-serif;font-size:20px;font-weight:700;color:var(--gray-900);margin-bottom:8px}
+.mfa-gate-sub{font-size:13px;color:var(--gray-500);line-height:1.6;margin-bottom:24px}
+.otp-row{display:flex;gap:6px;margin-bottom:12px;width:100%}
+.otp-input{flex:1;min-width:0;height:52px;border:2px solid #93c5fd;border-radius:8px;text-align:center;font-size:22px;font-weight:700;font-family:'Outfit',sans-serif;color:var(--gray-900);background:var(--blue-lt);outline:none;transition:border-color .15s,box-shadow .15s}
+.otp-input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,86,219,.15)}
+.otp-input.filled{border-color:var(--blue);background:#fff;color:var(--blue-dark)}
+.otp-input.error-state{border-color:var(--red);background:var(--red-lt)}
+.mfa-error{font-size:12px;color:var(--red);margin-bottom:12px;display:none}
+.mfa-error.show{display:block}
+.mfa-verify-btn{width:100%;height:44px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;margin-bottom:12px}
+.mfa-verify-btn:hover{background:var(--blue-dark)}
+.mfa-resend{font-size:12px;color:var(--gray-400)}
+.mfa-resend button{color:var(--blue);font-weight:500;background:none;border:none;cursor:pointer;font-size:12px;font-family:inherit}
+.mfa-resend button:disabled{color:var(--gray-400);cursor:default}
+.session-info{margin-top:16px;font-size:11px;color:var(--gray-400);display:flex;align-items:center;gap:6px}
+.session-info i{font-size:10px}
+
+/* ── VAULT CONTENT ── */
+.vault-content{display:none;flex-direction:column;gap:24px}
+.vault-content.show{display:flex}
+
+/* stats */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat-card{background:#fff;border:1px solid var(--gray-200);border-radius:12px;padding:16px 18px;transition:box-shadow .15s}
+.stat-card:hover{box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.stat-card.accent{border-left:3px solid var(--blue)}
+.stat-label{font-size:11px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.stat-value{font-family:'Outfit',sans-serif;font-size:22px;font-weight:600;color:var(--gray-900);line-height:1.1}
+.stat-sub{font-size:11px;color:var(--gray-500);margin-top:3px}
+.stat-sub.green{color:var(--green)}
+.stat-sub.amber{color:var(--amber-mid)}
+.stat-sub.blue{color:var(--blue)}
+
+/* upload zone */
+.upload-section{background:#fff;border:1px solid var(--gray-200);border-radius:12px;overflow:hidden}
+.upload-header{padding:16px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
+.section-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;color:var(--gray-900)}
+.section-sub{font-size:12px;color:var(--gray-400);margin-top:2px}
+.upload-body{padding:20px}
+.drop-zone{border:2px dashed var(--gray-200);border-radius:10px;padding:36px 24px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;position:relative}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--blue);background:var(--blue-lt)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{width:48px;height:48px;background:var(--gray-100);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.drop-icon i{font-size:20px;color:var(--gray-400)}
+.drop-zone:hover .drop-icon,.drop-zone.drag-over .drop-icon{background:var(--blue-lt)}
+.drop-zone:hover .drop-icon i,.drop-zone.drag-over .drop-icon i{color:var(--blue)}
+.drop-title{font-size:14px;font-weight:600;color:var(--gray-700);margin-bottom:4px}
+.drop-sub{font-size:12px;color:var(--gray-400);margin-bottom:14px}
+.drop-types{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+.type-pill{font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;background:var(--gray-100);color:var(--gray-500)}
+.upload-divider{display:flex;align-items:center;gap:12px;margin:16px 0}
+.udl{flex:1;height:1px;background:var(--gray-200)}
+.udt{font-size:11px;color:var(--gray-400)}
+.browse-btn{width:100%;height:40px;background:#fff;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;font-weight:500;color:var(--gray-700);font-family:'IBM Plex Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .12s,border-color .12s}
+.browse-btn:hover{background:var(--gray-50);border-color:var(--gray-300)}
+
+/* upload queue */
+.upload-queue{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.queue-item{display:flex;align-items:center;gap:12px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px 14px}
+.qi-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.qi-icon.pdf{background:#fef2f2;color:var(--red)}
+.qi-icon.img{background:var(--blue-lt);color:var(--blue)}
+.qi-icon.doc{background:#eff6ff;color:#2563eb}
+.qi-icon.xls{background:var(--green-lt);color:var(--green)}
+.qi-name{flex:1;font-size:13px;font-weight:500;color:var(--gray-800)}
+.qi-size{font-size:11px;color:var(--gray-400)}
+.qi-progress{flex:1;display:flex;flex-direction:column;gap:4px}
+.qi-bar-wrap{height:4px;background:var(--gray-200);border-radius:2px;overflow:hidden}
+.qi-bar{height:100%;background:var(--blue);border-radius:2px;transition:width .3s ease}
+.qi-status{font-size:10px;color:var(--gray-400)}
+.qi-remove{background:none;border:none;cursor:pointer;color:var(--gray-300);font-size:13px;padding:4px;transition:color .12s;flex-shrink:0}
+.qi-remove:hover{color:var(--red)}
+
+/* document table */
+.docs-section{background:#fff;border:1px solid var(--gray-200);border-radius:12px;overflow:hidden}
+.docs-toolbar{padding:14px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px}
+.search-wrap{position:relative;flex:1;max-width:280px}
+.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:12px;pointer-events:none}
+.search-input{width:100%;height:34px;border:1px solid var(--gray-200);border-radius:7px;padding:0 12px 0 30px;font-size:12px;font-family:'IBM Plex Sans',sans-serif;color:var(--gray-800);background:var(--gray-50);outline:none;transition:border-color .15s}
+.search-input:focus{border-color:var(--blue);background:#fff}
+.filter-pills{display:flex;gap:5px}
+.fp{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--gray-200);background:#fff;color:var(--gray-500);cursor:pointer;transition:all .12s}
+.fp:hover{border-color:var(--blue);color:var(--blue)}
+.fp.active{background:var(--blue-lt);border-color:var(--blue);color:var(--blue);font-weight:600}
+.docs-table-head{display:grid;grid-template-columns:36px 1fr 130px 110px 120px 60px;padding:9px 20px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400)}
+.doc-row{display:grid;grid-template-columns:36px 1fr 130px 110px 120px 60px;padding:12px 20px;border-bottom:1px solid var(--gray-100);align-items:center;cursor:pointer;transition:background .1s}
+.doc-row:last-child{border-bottom:none}
+.doc-row:hover{background:var(--gray-50)}
+.doc-row.hidden{display:none}
+.file-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.fi-pdf{background:#fef2f2;color:var(--red)}
+.fi-img{background:var(--blue-lt);color:var(--blue)}
+.fi-doc{background:#eff6ff;color:#2563eb}
+.fi-xls{background:var(--green-lt);color:var(--green)}
+.doc-name{font-size:13px;font-weight:500;color:var(--gray-800)}
+.doc-name-sub{font-size:10px;color:var(--gray-400);margin-top:1px}
+.project-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 8px;border-radius:5px}
+.pt-solar{background:#fef9c3;color:#854d0e}
+.pt-battery{background:var(--blue-lt);color:var(--blue-dark)}
+.pt-ev{background:var(--teal-lt);color:var(--teal)}
+.pt-contract{background:var(--purple-lt);color:var(--purple)}
+.doc-date{font-size:12px;color:var(--gray-500)}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px}
+.sb-matched{background:var(--green-lt);color:var(--green)}
+.sb-onfile{background:var(--blue-lt);color:var(--blue-dark)}
+.sb-pending{background:var(--amber-lt);color:var(--amber)}
+.sb-processing{background:var(--purple-lt);color:var(--purple)}
+.doc-menu{background:none;border:none;cursor:pointer;color:var(--gray-300);font-size:13px;padding:4px 8px;border-radius:5px;transition:all .12s}
+.doc-menu:hover{background:var(--gray-100);color:var(--gray-600)}
+
+/* ── CONFIRMATION DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;display:flex;align-items:center;justify-content:center;padding:20px 20px 20px calc(var(--sidebar-w) + 20px)}
+.drawer-overlay.show{opacity:1;pointer-events:all}
+.drawer{position:relative;background:#fff;border:1px solid var(--gray-200);border-radius:16px;z-index:201;transform:scale(.95);transition:transform .25s cubic-bezier(.32,.72,0,1);max-height:88vh;overflow-y:auto;width:100%;max-width:920px;box-shadow:0 24px 64px rgba(0,0,0,.2);display:none}
+.drawer-overlay.show .drawer{display:block;transform:scale(1)}
+.drawer-handle{width:36px;height:4px;background:var(--gray-200);border-radius:2px;margin:12px auto 0}
+.drawer-header{padding:16px 24px 14px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:12px}
+.drawer-title{font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:var(--gray-900);flex:1}
+.drawer-close{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px;padding:4px;border-radius:6px;transition:color .12s}
+.drawer-close:hover{color:var(--gray-700)}
+.drawer-body{padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.drawer-col-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:10px}
+
+/* file preview */
+.file-preview{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.fp-icon{width:52px;height:52px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.fp-name{font-size:13px;font-weight:500;color:var(--gray-800)}
+.fp-meta{font-size:11px;color:var(--gray-400)}
+
+/* AI extraction result */
+.ai-fields{display:flex;flex-direction:column;gap:8px}
+.ai-field{display:flex;flex-direction:column;gap:3px}
+.ai-field-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400)}
+.ai-field-value{font-size:13px;font-weight:500;color:var(--gray-800)}
+.ai-field-value.highlight{color:var(--blue);font-weight:600}
+.ai-field-value.amount{color:var(--green);font-weight:700;font-family:'Outfit',sans-serif;font-size:16px}
+
+/* editable field */
+.ai-field-input{height:34px;border:1px solid var(--gray-200);border-radius:6px;padding:0 10px;font-size:13px;font-family:'IBM Plex Sans',sans-serif;color:var(--gray-800);background:#fff;outline:none;width:100%;transition:border-color .15s}
+.ai-field-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+.ai-select{height:34px;border:1px solid var(--gray-200);border-radius:6px;padding:0 10px;font-size:13px;font-family:'IBM Plex Sans',sans-serif;color:var(--gray-800);background:#fff;outline:none;width:100%;cursor:pointer;transition:border-color .15s}
+.ai-select:focus{border-color:var(--blue)}
+
+.ai-confidence{display:flex;align-items:center;gap:8px;background:var(--green-lt);border:1px solid var(--green-mid);border-radius:8px;padding:8px 12px;margin-top:4px}
+.ai-confidence i{color:var(--green);font-size:12px}
+.ai-confidence span{font-size:11px;color:var(--green);font-weight:500}
+
+.credit-match-preview{background:var(--blue-lt);border:1px solid var(--blue-mid);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.cm-code{font-size:12px;font-weight:700;padding:3px 8px;background:var(--blue);color:#fff;border-radius:5px;font-family:monospace;flex-shrink:0}
+.cm-text{font-size:12px;color:var(--blue-dark)}
+.cm-text strong{font-weight:600}
+.cm-amount{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:var(--blue-dark);margin-left:auto;flex-shrink:0}
+
+.drawer-footer{padding:16px 24px;border-top:1px solid var(--gray-100);display:flex;align-items:center;gap:12px;background:#fff}
+.btn-confirm{flex:1;height:44px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+.btn-confirm:hover{background:var(--blue-dark)}
+.btn-cancel{height:44px;padding:0 20px;background:#fff;color:var(--gray-600);border:1px solid var(--gray-200);border-radius:8px;font-size:13px;font-weight:500;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;transition:background .12s}
+.btn-cancel:hover{background:var(--gray-50)}
+.disclaimer{font-size:10px;color:var(--gray-400);text-align:center;line-height:1.5;margin-top:2px}
+.drawer-nudge{display:none;background:#fffbe6;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400e;line-height:1.6;margin-bottom:12px}
+.drawer-nudge i{margin-right:6px;color:#d97706}
+.ai-confidence.low-conf .ai-conf-bar-wrap .ai-conf-bar{background:var(--amber-mid)!important}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;right:28px;background:var(--gray-900);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;z-index:500;transform:translateY(20px);opacity:0;transition:all .25s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success i{color:#4ade80}
+.toast.error i{color:#f87171}
+
+/* ── SESSION TIMER ── */
+.session-timer-wrap{position:fixed;top:66px;right:16px;z-index:150;display:none}
+.session-timer-wrap.show{display:block}
+.session-timer-card{background:#fff;border:1px solid var(--gray-200);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--gray-600);display:flex;align-items:center;gap:7px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.session-timer-card.expiring{border-color:#fde68a;color:var(--amber);background:var(--amber-lt)}
+#session-clock{font-weight:700;font-family:'Outfit',sans-serif;font-size:13px}
+
+/* animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.vault-content>*{animation:fadeUp .3s ease both}
+.vault-content>*:nth-child(1){animation-delay:.04s}
+.vault-content>*:nth-child(2){animation-delay:.08s}
+.vault-content>*:nth-child(3){animation-delay:.12s}
+
+/* processing animation */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .8s linear infinite}
+
+/* ── CLASSIFICATION EDITOR MODAL ── */
+.ce-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;opacity:0;pointer-events:none;transition:opacity .2s;display:flex;align-items:center;justify-content:center;padding:24px}
+.ce-overlay.show{opacity:1;pointer-events:all}
+.ce-modal{background:#fff;border-radius:16px;width:100%;max-width:720px;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;transform:translateY(16px) scale(.98);transition:transform .25s cubic-bezier(.32,.72,0,1);box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.ce-overlay.show .ce-modal{transform:none}
+.ce-modal-header{padding:18px 24px 14px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:#fff;z-index:1;border-radius:16px 16px 0 0}
+.ce-modal-icon{width:36px;height:36px;border-radius:9px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ce-modal-icon i{font-size:15px;color:var(--blue)}
+.ce-modal-title{font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:var(--gray-900);flex:1}
+.ce-modal-sub{font-size:11px;color:var(--gray-400);margin-top:1px}
+.ce-close{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:17px;padding:4px 8px;border-radius:6px;transition:color .12s}
+.ce-close:hover{color:var(--gray-700)}
+.ce-body{padding:20px 24px;display:flex;flex-direction:column;gap:18px}
+
+/* raw text banner */
+.ce-raw-banner{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px 14px;display:flex;align-items:flex-start;gap:10px}
+.ce-raw-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);white-space:nowrap;margin-top:2px}
+.ce-raw-text{font-size:12px;color:var(--gray-600);font-family:'IBM Plex Mono',monospace;flex:1;line-height:1.5}
+
+/* field grid */
+.ce-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ce-field{display:flex;flex-direction:column;gap:5px}
+.ce-field.full{grid-column:1/-1}
+.ce-label{font-size:11px;font-weight:600;color:var(--gray-700);display:flex;align-items:center;gap:6px}
+.ce-tag{font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.03em}
+.ce-tag-ai{background:var(--purple-lt);color:var(--purple)}
+.ce-tag-user{background:var(--green-lt);color:var(--green)}
+.ce-tag-locked{background:var(--gray-100);color:var(--gray-500)}
+.ce-input{height:36px;border:1px solid var(--gray-200);border-radius:7px;padding:0 11px;font-size:13px;font-family:'IBM Plex Sans',sans-serif;color:var(--gray-800);background:#fff;outline:none;width:100%;transition:border-color .15s,box-shadow .15s}
+.ce-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+.ce-input:disabled{background:var(--gray-50);color:var(--gray-400);cursor:not-allowed}
+.ce-select{height:36px;border:1px solid var(--gray-200);border-radius:7px;padding:0 11px;font-size:13px;font-family:'IBM Plex Sans',sans-serif;color:var(--gray-800);background:#fff;outline:none;width:100%;cursor:pointer;transition:border-color .15s}
+.ce-select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+.ce-textarea{border:1px solid var(--gray-200);border-radius:7px;padding:9px 11px;font-size:12px;font-family:'IBM Plex Sans',sans-serif;color:var(--gray-800);background:#fff;outline:none;width:100%;resize:vertical;min-height:72px;line-height:1.55;transition:border-color .15s}
+.ce-textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+
+/* confidence row */
+.ce-conf-section{display:flex;flex-direction:column;gap:8px}
+.ce-conf-row{display:flex;align-items:center;gap:10px}
+.ce-conf-label{font-size:11px;color:var(--gray-500);width:120px;flex-shrink:0}
+.ce-conf-bar-wrap{flex:1;height:5px;background:var(--gray-100);border-radius:3px;overflow:hidden}
+.ce-conf-bar{height:100%;border-radius:3px;transition:width .4s ease}
+.ce-conf-pct{font-size:11px;font-weight:600;width:34px;text-align:right;flex-shrink:0}
+
+/* audit trail */
+.ce-audit{display:flex;flex-direction:column;gap:0}
+.ce-audit-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid var(--gray-100)}
+.ce-audit-item:last-child{border-bottom:none}
+.ce-audit-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.ce-audit-dot.blue{background:var(--blue)}
+.ce-audit-dot.green{background:var(--green)}
+.ce-audit-dot.purple{background:var(--purple)}
+.ce-audit-dot.gray{background:var(--gray-300)}
+.ce-audit-text{font-size:12px;color:var(--gray-600);line-height:1.5}
+.ce-audit-text strong{color:var(--gray-800);font-weight:600}
+.ce-audit-time{font-size:10px;color:var(--gray-400);margin-top:2px}
+
+/* section divider */
+.ce-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);padding-bottom:8px;border-bottom:1px solid var(--gray-100)}
+
+.ce-immutable-note{display:flex;align-items:flex-start;gap:9px;background:var(--amber-lt);border:1px solid #fde68a;border-radius:8px;padding:10px 13px}
+.ce-immutable-note i{color:var(--amber-mid);font-size:12px;flex-shrink:0;margin-top:1px}
+.ce-immutable-note span{font-size:11px;color:var(--amber);line-height:1.55}
+
+.ce-footer{padding:16px 24px;border-top:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;position:sticky;bottom:0;background:#fff;border-radius:0 0 16px 16px}
+.ce-save-btn{flex:1;height:42px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .15s}
+.ce-save-btn:hover{background:var(--blue-dark)}
+.ce-cancel-btn{height:42px;padding:0 18px;background:#fff;color:var(--gray-600);border:1px solid var(--gray-200);border-radius:8px;font-size:13px;font-weight:500;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;transition:background .12s}
+.ce-cancel-btn:hover{background:var(--gray-50)}
+
+/* context menu */
+.ctx-menu{position:absolute;background:#fff;border:1px solid var(--gray-200);border-radius:10px;padding:4px;min-width:180px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.1);display:none}
+.ctx-menu.show{display:block}
+.ctx-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;font-size:12px;color:var(--gray-700);cursor:pointer;transition:background .1s}
+.ctx-item:hover{background:var(--gray-50)}
+.ctx-item i{width:14px;text-align:center;font-size:12px;color:var(--gray-400)}
+.ctx-item.danger{color:var(--red)}
+.ctx-item.danger i{color:var(--red)}
+.ctx-divider{height:1px;background:var(--gray-100);margin:3px 0}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark"><i class="fa-solid fa-bolt"></i></div>
+    <div>
+      <div class="brand-name">Solenetec</div>
+      <div style="font-size:10px;color:var(--gray-400)">Client Portal</div>
+    </div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">My Project</div>
+    <a class="nav-item" href="portal-dashboard.html"><i class="fa-solid fa-house-chimney"></i> Dashboard</a>
+    <a class="nav-item" href="portal-dashboard.html#milestones"><i class="fa-solid fa-list-check"></i> Project milestones</a>
+    <a class="nav-item" href="portal-contracts.html"><i class="fa-regular fa-file-lines"></i> Contracts</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Documents</div>
+    <a class="nav-item active" href="portal-vault.html"><i class="fa-solid fa-vault"></i> Document vault</a>
+    <a class="nav-item" href="portal-vault.html?view=receipts"><i class="fa-solid fa-receipt"></i> Receipts &amp; invoices</a>
+    <a class="nav-item" href="portal-vault.html?view=credits"><i class="fa-solid fa-file-invoice-dollar"></i> Tax credits</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Support</div>
+    <a class="nav-item" href="portal-dashboard.html#solen"><i class="fa-solid fa-robot"></i> Ask Solen AI</a>
+    <a class="nav-item" href="YOUR_CALENDLY_URL" target="_blank"><i class="fa-regular fa-calendar"></i> Schedule call</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="client-chip">
+      <div class="avatar" id="vault-avatar">AC</div>
+      <div><div class="client-name" id="vault-client-name">Alex Colocho</div><div class="client-role" id="vault-client-role">Solenetec Client</div></div>
+      <button class="logout-btn" title="Sign out" onclick="(async()=>{await window._vaultSb.auth.signOut();localStorage.removeItem('vault_session');sessionStorage.clear();window.location.href='portal-login.html';})()"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title">Document vault <span>Encrypted · MFA protected</span></div>
+    <div class="session-badge" id="session-badge">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span id="session-label">Session secure</span>
+    </div>
+    <div class="topbar-icon"><i class="fa-regular fa-bell" style="font-size:14px"></i></div>
+    <div class="topbar-icon"><i class="fa-solid fa-lock" style="font-size:13px"></i></div>
+  </div>
+
+  <!-- SESSION COUNTDOWN (appears when < 2 min left) -->
+  <div class="session-timer-wrap" id="session-timer-wrap">
+    <div class="session-timer-card" id="session-timer-card">
+      <i class="fa-regular fa-clock"></i>
+      Session expires in <span id="session-clock">--:--</span>
+      <button onclick="extendSession()" style="margin-left:4px;font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;font-weight:600;font-family:inherit">Extend</button>
+    </div>
+  </div>
+
+  <!-- ══ MFA GATE ══ -->
+  <div class="page-content mfa-gate show" id="mfa-gate">
+    <div class="mfa-gate-card">
+      <div class="mfa-gate-icon"><i class="fa-solid fa-vault"></i></div>
+      <div class="mfa-gate-title">Verify your identity</div>
+      <div class="mfa-gate-sub">Your document vault contains sensitive financial and legal information. Enter the 6-digit code from your <strong>authenticator app</strong> (Google Authenticator, Authy, or 1Password) to continue.</div>
+      <div class="otp-row">
+        <input class="otp-input" id="g-otp-0" maxlength="1" inputmode="numeric"/>
+        <input class="otp-input" id="g-otp-1" maxlength="1" inputmode="numeric"/>
+        <input class="otp-input" id="g-otp-2" maxlength="1" inputmode="numeric"/>
+        <input class="otp-input" id="g-otp-3" maxlength="1" inputmode="numeric"/>
+        <input class="otp-input" id="g-otp-4" maxlength="1" inputmode="numeric"/>
+        <input class="otp-input" id="g-otp-5" maxlength="1" inputmode="numeric"/>
+      </div>
+      <div class="mfa-error" id="gate-error">Incorrect code. Please try again.</div>
+      <button class="mfa-verify-btn" onclick="verifyGateMFA()">
+        <i class="fa-solid fa-unlock"></i> Unlock vault
+      </button>
+      <div class="mfa-resend">Didn't receive it? <button id="gate-resend" onclick="startGateResend()" disabled>Resend in <span id="gate-timer">30s</span></button></div>
+      <div class="session-info"><i class="fa-solid fa-circle-info"></i> Verified sessions last 15 minutes of inactivity</div>
+    </div>
+  </div>
+
+  <!-- ══ VAULT CONTENT ══ -->
+  <div class="page-content vault-content" id="vault-content">
+
+    <!-- STAT CARDS -->
+    <div class="stats-row">
+      <div class="stat-card accent">
+        <div class="stat-label">Total documents</div>
+        <div class="stat-value">8</div>
+        <div class="stat-sub blue">Across 3 projects</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Credits matched</div>
+        <div class="stat-value">$13,335</div>
+        <div class="stat-sub green">4 docs processed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending review</div>
+        <div class="stat-value">2</div>
+        <div class="stat-sub amber">Awaiting AI processing</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Last updated</div>
+        <div class="stat-value" style="font-size:16px">Mar 28</div>
+        <div class="stat-sub">SGIP application</div>
+      </div>
+    </div>
+
+    <!-- UPLOAD SECTION -->
+    <div class="upload-section">
+      <div class="upload-header">
+        <div>
+          <div class="section-title">Upload documents</div>
+          <div class="section-sub">Receipts, invoices, permits, contracts — all accepted</div>
+        </div>
+      </div>
+      <div class="upload-body">
+        <div class="drop-zone" id="drop-zone">
+          <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx" onchange="handleFiles(this.files)"/>
+          <div class="drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+          <div class="drop-title">Drop files here to upload</div>
+          <div class="drop-sub">or click to browse from your device</div>
+          <div class="drop-types">
+            <span class="type-pill">PDF</span>
+            <span class="type-pill">JPG</span>
+            <span class="type-pill">PNG</span>
+            <span class="type-pill">Word</span>
+            <span class="type-pill">Excel</span>
+            <span class="type-pill">Max 25 MB</span>
+          </div>
+        </div>
+        <div class="upload-queue" id="upload-queue"></div>
+      </div>
+    </div>
+
+    <!-- DOCUMENT TABLE -->
+    <div class="docs-section">
+      <div class="docs-toolbar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input class="search-input" placeholder="Search documents…" oninput="filterDocs(this.value)" id="search-input"/>
+        </div>
+        <div class="filter-pills">
+          <button class="fp active" data-filter="all">All</button>
+          <button class="fp" data-filter="solar">Solar</button>
+          <button class="fp" data-filter="battery">Battery</button>
+          <button class="fp" data-filter="ev">EV Charger</button>
+          <button class="fp" data-filter="contract">Contracts</button>
+        </div>
+        <button onclick="exportReport()" style="margin-left:auto;display:flex;align-items:center;gap:6px;padding:6px 14px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .12s" onmouseover="this.style.background='#166534'" onmouseout="this.style.background='var(--green)'">
+          <i class="fa-solid fa-file-export"></i> Export CPA report
+        </button>
+      </div>
+      <div class="docs-table-head">
+        <div></div><div>File</div><div>Project</div><div>Updated</div><div>Status</div><div></div>
+      </div>
+      <div class="docs-table-body" id="vault-docs-body">
+        <div class="file-icon fi-pdf"><i class="fa-solid fa-file-pdf"></i></div>
+        <div><div class="doc-name">Enphase IQ8M purchase receipt</div><div class="doc-name-sub">$28,400 · Sunrun San Diego</div></div>
+        <span class="project-tag pt-solar"><i class="fa-solid fa-sun" style="font-size:9px"></i> Solar</span>
+        <div class="doc-date">Mar 14, 2025</div>
+        <span class="status-badge sb-matched"><i class="fa-solid fa-circle-check" style="font-size:9px"></i> §25D matched</span>
+        <button class="doc-menu" onclick="openCtxMenu(event, this.closest('.doc-row'))"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>
+      <div class="doc-row" data-project="solar" onclick="openDocDetail(this)">
+        <div class="file-icon fi-img"><i class="fa-solid fa-image"></i></div>
+        <div><div class="doc-name">Permit approval — City of San Diego</div><div class="doc-name-sub">Building permit #SD-2025-04821</div></div>
+        <span class="project-tag pt-solar"><i class="fa-solid fa-sun" style="font-size:9px"></i> Solar</span>
+        <div class="doc-date">Feb 3, 2025</div>
+        <span class="status-badge sb-onfile"><i class="fa-solid fa-folder" style="font-size:9px"></i> On file</span>
+        <button class="doc-menu" onclick="openCtxMenu(event, this.closest('.doc-row'))"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>
+      <div class="doc-row" data-project="solar" onclick="openDocDetail(this)">
+        <div class="file-icon fi-pdf"><i class="fa-solid fa-file-pdf"></i></div>
+        <div><div class="doc-name">PTO letter — SDG&E interconnection</div><div class="doc-name-sub">Permission to operate · System live</div></div>
+        <span class="project-tag pt-solar"><i class="fa-solid fa-sun" style="font-size:9px"></i> Solar</span>
+        <div class="doc-date">Apr 1, 2025</div>
+        <span class="status-badge sb-onfile"><i class="fa-solid fa-folder" style="font-size:9px"></i> On file</span>
+        <button class="doc-menu" onclick="openCtxMenu(event, this.closest('.doc-row'))"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>
+      <div class="doc-row" data-project="battery" onclick="openDocDetail(this)">
+        <div class="file-icon fi-pdf"><i class="fa-solid fa-file-pdf"></i></div>
+        <div><div class="doc-name">Enphase IQ 5P battery invoice</div><div class="doc-name-sub">$14,200 · 2 units</div></div>
+        <span class="project-tag pt-battery"><i class="fa-solid fa-battery-three-quarters" style="font-size:9px"></i> Battery</span>
+        <div class="doc-date">Oct 4, 2025</div>
+        <span class="status-badge sb-matched"><i class="fa-solid fa-circle-check" style="font-size:9px"></i> §25D matched</span>
+        <button class="doc-menu" onclick="openCtxMenu(event, this.closest('.doc-row'))"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>
+      <div class="doc-row" data-project="battery" onclick="openDocDetail(this)">
+        <div class="file-icon fi-doc"><i class="fa-solid fa-file-word"></i></div>
+        <div><div class="doc-name">SGIP rebate application</div><div class="doc-name-sub">Self-Generation Incentive Program · CA</div></div>
+        <span class="project-tag pt-battery"><i class="fa-solid fa-battery-three-quarters" style="font-size:9px"></i> Battery</span>
+        <div class="doc-date">Mar 28, 2026</div>
+        <span class="status-badge sb-pending"><i class="fa-solid fa-clock" style="font-size:9px"></i> Pending review</span>
+        <button class="doc-menu" onclick="openCtxMenu(event, this.closest('.doc-row'))"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>
+      <div class="doc-row" data-project="ev" onclick="openDocDetail(this)">
+        <div class="file-icon fi-pdf"><i class="fa-solid fa-file-pdf"></i></div>
+        <div><div class="doc-name">EV charger quote — Enphase IQ 2</div><div class="doc-name-sub">$1,850 estimate · 48A Level 2</div></div>
+        <span class="project-tag pt-ev"><i class="fa-solid fa-charging-station" style="font-size:9px"></i> EV Charger</span>
+        <div class="doc-date">Mar 2, 2026</div>
+        <span class="status-badge sb-pending"><i class="fa-solid fa-clock" style="font-size:9px"></i> Pending AI</span>
+        <button class="doc-menu" onclick="openCtxMenu(event, this.closest('.doc-row'))"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>
+      <div class="doc-row" data-project="contract" onclick="openDocDetail(this)">
+        <div class="file-icon fi-pdf"><i class="fa-solid fa-file-pdf"></i></div>
+        <div><div class="doc-name">Solenetec installation agreement</div><div class="doc-name-sub">Signed · Solar + Battery scope</div></div>
+        <span class="project-tag pt-contract"><i class="fa-solid fa-file-signature" style="font-size:9px"></i> Contract</span>
+        <div class="doc-date">Jan 6, 2025</div>
+        <span class="status-badge sb-onfile"><i class="fa-solid fa-folder" style="font-size:9px"></i> On file</span>
+        <button class="doc-menu" onclick="openCtxMenu(event, this.closest('.doc-row'))"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>
+      <div class="doc-row" data-project="contract" onclick="openDocDetail(this)">
+        <div class="file-icon fi-pdf"><i class="fa-solid fa-file-pdf"></i></div>
+        <div><div class="doc-name">Warranty certificate — Enphase 25yr</div><div class="doc-name-sub">Product + labor warranty</div></div>
+        <span class="project-tag pt-contract"><i class="fa-solid fa-file-signature" style="font-size:9px"></i> Contract</span>
+        <div class="doc-date">Apr 1, 2025</div>
+        <span class="status-badge sb-onfile"><i class="fa-solid fa-folder" style="font-size:9px"></i> On file</span>
+        <button class="doc-menu" onclick="openCtxMenu(event, this.closest('.doc-row'))"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>
+      </div><!-- end docs-table-body -->
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRMATION DRAWER ══ -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+<div class="drawer" id="confirm-drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <i class="fa-solid fa-robot" style="color:var(--blue);font-size:16px"></i>
+    <div class="drawer-title">Review AI extraction — confirm before processing</div>
+    <button class="drawer-close" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="drawer-body">
+    <!-- Left: file preview -->
+    <div>
+      <div class="drawer-col-title">Uploaded file</div>
+      <div class="file-preview" id="drawer-file-preview">
+        <div class="fp-icon fi-pdf" id="drawer-fp-icon"><i class="fa-solid fa-file-pdf"></i></div>
+        <div class="fp-name" id="drawer-fp-name">receipt.pdf</div>
+        <div class="fp-meta" id="drawer-fp-meta">PDF · 1.2 MB</div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="drawer-col-title">AI confidence</div>
+        <div class="ai-confidence" id="drawer-confidence">
+          <i class="fa-solid fa-circle-check"></i>
+          <span id="drawer-conf-text">High confidence — 94% match on equipment type and cost</span>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="drawer-col-title">Suggested IRC credit match</div>
+        <div class="credit-match-preview">
+          <span class="cm-code" id="drawer-credit-code">§25D</span>
+          <div class="cm-text" id="drawer-credit-text">Residential clean energy credit<br><strong>30%</strong> of eligible cost</div>
+          <div class="cm-amount" id="drawer-credit-amount">$4,260</div>
+        </div>
+      </div>
+    </div>
+    <!-- Right: extracted fields (editable) -->
+    <div>
+      <div class="drawer-col-title">Extracted details — review &amp; edit if needed</div>
+      <div class="ai-fields">
+        <div class="ai-field">
+          <div class="ai-field-label">Equipment type</div>
+          <input class="ai-field-input" id="drawer-equipment" value="Solar panels — Enphase IQ8M"/>
+        </div>
+        <div class="ai-field">
+          <div class="ai-field-label">Purchase amount</div>
+          <input class="ai-field-input" id="drawer-amount" value="$14,200.00"/>
+        </div>
+        <div class="ai-field">
+          <div class="ai-field-label">Purchase / install date</div>
+          <input class="ai-field-input" id="drawer-date" value="October 4, 2025"/>
+        </div>
+        <div class="ai-field">
+          <div class="ai-field-label">Installer / vendor</div>
+          <input class="ai-field-input" id="drawer-vendor" value="Sunrun San Diego"/>
+        </div>
+        <div class="ai-field">
+          <div class="ai-field-label">Assign to project</div>
+          <select class="ai-select" id="drawer-project">
+            <option value="solar">Solar — 9.6 kW (Jan 2025)</option>
+            <option value="battery" selected>Battery — Enphase IQ 5P (Sep 2025)</option>
+            <option value="ev">EV Charger (Planned)</option>
+          </select>
+        </div>
+        <div class="ai-field">
+          <div class="ai-field-label">Document type</div>
+          <select class="ai-select" id="drawer-doctype">
+            <option value="invoice" selected>Invoice / Receipt</option>
+            <option value="contract">Contract / Agreement</option>
+            <option value="permit">Permit / Inspection</option>
+            <option value="warranty">Warranty Certificate</option>
+            <option value="rebate">Rebate Application</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 24px 4px">
+    <div class="drawer-nudge" id="drawer-nudge">
+      <i class="fa-solid fa-lightbulb"></i>
+      <strong>This receipt format was hard to read automatically.</strong> This is common with email confirmations and screenshots. Please fill in the equipment type, purchase amount, and date manually — it only takes a moment and ensures your IRS credit is captured correctly.
+    </div>
+    <div class="disclaimer">By confirming, you authorize Solen AI to store this document securely and use the extracted data to generate your IRS credit report. You can remove any document at any time.</div>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn-cancel" onclick="closeDrawer()">Cancel upload</button>
+    <button class="btn-confirm" onclick="confirmUpload()">
+      <i class="fa-solid fa-circle-check"></i> Confirm &amp; process document
+    </button>
+  </div>
+</div>
+</div><!-- end drawer-overlay -->
+
+<!-- ══ CONTEXT MENU ══ -->
+<div class="ctx-menu" id="ctx-menu">
+  <div class="ctx-item" onclick="ctxEdit()"><i class="fa-solid fa-pen"></i> Edit classification</div>
+  <div class="ctx-item" onclick="ctxView()"><i class="fa-regular fa-eye"></i> View document</div>
+  <div class="ctx-item" onclick="ctxDownload()"><i class="fa-solid fa-arrow-down-to-line"></i> Download</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" onclick="ctxHistory()"><i class="fa-solid fa-clock-rotate-left"></i> View history</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item danger" onclick="ctxDelete()"><i class="fa-solid fa-trash"></i> Remove document</div>
+</div>
+
+<!-- ══ CLASSIFICATION EDITOR MODAL ══ -->
+<div class="ce-overlay" id="ce-overlay" onclick="closeCE(event)">
+  <div class="ce-modal" id="ce-modal">
+    <div class="ce-modal-header">
+      <div class="ce-modal-icon"><i class="fa-solid fa-tags"></i></div>
+      <div>
+        <div class="ce-modal-title" id="ce-doc-title">Edit classification</div>
+        <div class="ce-modal-sub">Original file is immutable — only metadata &amp; classification are editable</div>
+      </div>
+      <button class="ce-close" onclick="closeCEBtn()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="ce-body">
+
+      <!-- Raw text banner -->
+      <div class="ce-raw-banner">
+        <span class="ce-raw-label">Raw text</span>
+        <span class="ce-raw-text" id="ce-raw-text">SUNRUN *SOLAR SD 04/02/25 $28,400.00</span>
+      </div>
+
+      <div class="ce-immutable-note">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>The original uploaded file is locked and cannot be altered. You are editing the <strong>classification layer only</strong> — equipment type, project assignment, IRC credit code, and notes. All changes are logged with your name and timestamp.</span>
+      </div>
+
+      <!-- Editable fields -->
+      <div>
+        <div class="ce-section-title" style="margin-bottom:14px">Classification details</div>
+        <div class="ce-grid">
+          <div class="ce-field">
+            <label class="ce-label">Equipment type <span class="ce-tag ce-tag-ai" id="ce-equip-tag">AI</span></label>
+            <input class="ce-input" id="ce-equipment" placeholder="e.g. Enphase IQ8M Solar Panels"/>
+          </div>
+          <div class="ce-field">
+            <label class="ce-label">Purchase amount <span class="ce-tag ce-tag-locked">Locked</span></label>
+            <input class="ce-input" id="ce-amount" disabled/>
+          </div>
+          <div class="ce-field">
+            <label class="ce-label">Purchase / install date <span class="ce-tag ce-tag-ai" id="ce-date-tag">AI</span></label>
+            <input class="ce-input" id="ce-date" placeholder="e.g. March 14, 2025"/>
+          </div>
+          <div class="ce-field">
+            <label class="ce-label">Installer / vendor <span class="ce-tag ce-tag-ai" id="ce-vendor-tag">AI</span></label>
+            <input class="ce-input" id="ce-vendor" placeholder="e.g. Sunrun San Diego"/>
+          </div>
+          <div class="ce-field">
+            <label class="ce-label">Assign to project <span class="ce-tag ce-tag-user" id="ce-proj-tag">User</span></label>
+            <select class="ce-select" id="ce-project">
+              <option value="solar">Solar — 9.6 kW (Jan 2025)</option>
+              <option value="battery">Battery — Enphase IQ 5P (Sep 2025)</option>
+              <option value="ev">EV Charger (Planned Q3 2026)</option>
+            </select>
+          </div>
+          <div class="ce-field">
+            <label class="ce-label">IRC credit classification <span class="ce-tag ce-tag-user" id="ce-irc-tag">User</span></label>
+            <select class="ce-select" id="ce-irc">
+              <option value="25d">§25D — Residential clean energy (Solar / Battery)</option>
+              <option value="25c">§25C — Home improvement (Heat pump / HVAC)</option>
+              <option value="30c">§30C — EV refueling property</option>
+              <option value="48">§48 — Commercial ITC</option>
+              <option value="179d">§179D — Commercial building efficiency</option>
+              <option value="45l">§45L — Energy-efficient home construction</option>
+              <option value="none">No credit — document only</option>
+            </select>
+          </div>
+          <div class="ce-field">
+            <label class="ce-label">Document type</label>
+            <select class="ce-select" id="ce-doctype">
+              <option value="invoice">Invoice / Receipt</option>
+              <option value="contract">Contract / Agreement</option>
+              <option value="permit">Permit / Inspection report</option>
+              <option value="warranty">Warranty certificate</option>
+              <option value="rebate">Rebate application</option>
+              <option value="statement">Bank / card statement</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="ce-field full">
+            <label class="ce-label">Notes for CPA / tax preparer</label>
+            <textarea class="ce-textarea" id="ce-notes" placeholder="Add any context that will help your CPA understand this document — e.g. 'Visa card charge from Sunrun — confirmed solar panel purchase per contract dated Jan 6, 2025'"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Confidence -->
+      <div>
+        <div class="ce-section-title" style="margin-bottom:12px">AI confidence by field</div>
+        <div class="ce-conf-section" id="ce-conf-section">
+          <div class="ce-conf-row">
+            <span class="ce-conf-label">Vendor match</span>
+            <div class="ce-conf-bar-wrap"><div class="ce-conf-bar" id="conf-vendor" style="width:92%;background:#15803d"></div></div>
+            <span class="ce-conf-pct" style="color:#15803d">92%</span>
+          </div>
+          <div class="ce-conf-row">
+            <span class="ce-conf-label">Amount</span>
+            <div class="ce-conf-bar-wrap"><div class="ce-conf-bar" id="conf-amount" style="width:100%;background:#15803d"></div></div>
+            <span class="ce-conf-pct" style="color:#15803d">100%</span>
+          </div>
+          <div class="ce-conf-row">
+            <span class="ce-conf-label">Equipment type</span>
+            <div class="ce-conf-bar-wrap"><div class="ce-conf-bar" id="conf-equip" style="width:58%;background:#d97706"></div></div>
+            <span class="ce-conf-pct" style="color:#d97706">58%</span>
+          </div>
+          <div class="ce-conf-row">
+            <span class="ce-conf-label">IRC credit match</span>
+            <div class="ce-conf-bar-wrap"><div class="ce-conf-bar" id="conf-irc" style="width:78%;background:#1a56db"></div></div>
+            <span class="ce-conf-pct" style="color:#1a56db">78%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audit trail -->
+      <div>
+        <div class="ce-section-title" style="margin-bottom:4px">Classification history</div>
+        <div class="ce-audit" id="ce-audit-trail">
+          <div class="ce-audit-item">
+            <div class="ce-audit-dot green"></div>
+            <div>
+              <div class="ce-audit-text"><strong>Mar 28, 2026 — 2:14 PM:</strong> User updated equipment type to "Enphase IQ8M Solar Panels" and confirmed §25D credit match</div>
+              <div class="ce-audit-time">Marcus Johnson · via portal</div>
+            </div>
+          </div>
+          <div class="ce-audit-item">
+            <div class="ce-audit-dot purple"></div>
+            <div>
+              <div class="ce-audit-text"><strong>Mar 2, 2026 — 10:41 AM:</strong> AI extracted vendor "SUNRUN *SOLAR SD", amount $28,400, suggested Solar panel purchase (58% confidence on equipment type)</div>
+              <div class="ce-audit-time">Solen AI · automatic extraction</div>
+            </div>
+          </div>
+          <div class="ce-audit-item">
+            <div class="ce-audit-dot gray"></div>
+            <div>
+              <div class="ce-audit-text"><strong>Mar 2, 2026 — 10:40 AM:</strong> Document uploaded to vault</div>
+              <div class="ce-audit-time">Marcus Johnson · via portal</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="ce-footer">
+      <button class="ce-cancel-btn" onclick="closeCEBtn()">Cancel</button>
+      <button class="ce-save-btn" onclick="saveCE()">
+        <i class="fa-solid fa-floppy-disk"></i> Save classification
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toast-msg">Done</span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ── SUPABASE INIT (runs immediately after SDK loads) ────────────
+const SUPABASE_URL      = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+window._vaultSb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: true, storageKey: 'solenetec_portal_session' }
+});
+window._vaultProjectId = null;
+
+// ── VAULT INIT ──────────────────────────────────────────────────
+window.addEventListener('load', async () => {
+  try {
+    const { data: { session } } = await window._vaultSb.auth.getSession();
+    if (!session) { window.location.href = 'portal-login.html'; return; }
+
+    // Update sidebar client chip
+    const name = session.user?.user_metadata?.full_name || session.user?.email || 'Client';
+    const initials = name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+    const chipAvatar = document.getElementById('vault-avatar');
+    const chipName   = document.getElementById('vault-client-name');
+    const chipRole   = document.getElementById('vault-client-role');
+    if (chipAvatar) chipAvatar.textContent = initials;
+    if (chipName)   chipName.textContent   = name;
+    if (chipRole)   chipRole.textContent   = 'Solenetec Client';
+
+    // Fetch first project for upload association
+    const { data: projects } = await window._vaultSb
+      .from('projects').select('id').eq('client_id', session.user.id).limit(1);
+    if (projects?.[0]) window._vaultProjectId = projects[0].id;
+
+    // Highlight correct sidebar nav item
+  const vf = new URLSearchParams(window.location.search).get('view');
+  document.querySelectorAll('.nav-item').forEach(a => a.classList.remove('active'));
+  if (vf === 'receipts') {
+    document.querySelector('[href="portal-vault.html?view=receipts"]')?.classList.add('active');
+  } else if (vf === 'credits') {
+    document.querySelector('[href="portal-vault.html?view=credits"]')?.classList.add('active');
+  } else {
+    document.querySelector('[href="portal-vault.html"]')?.classList.add('active');
+  }
+
+  // Check existing vault session — skip gate if still valid
+    if (checkExistingSession()) {
+      document.getElementById('mfa-gate').classList.remove('show');
+      document.getElementById('vault-content').classList.add('show');
+      loadVaultDocuments();
+    } else {
+      // Show gate and start resend timer
+      startGateResend();
+    }
+  } catch(e) {
+    console.error('Vault init:', e.message);
+    // Still show gate on error
+    startGateResend();
+  }
+});
+
+// ── LOAD VAULT DOCUMENTS ────────────────────────────────────────
+async function loadVaultDocuments(filterOverride) {
+  const sb = window._vaultSb;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+
+  // Determine filter from URL param or override
+  const urlFilter = filterOverride || new URLSearchParams(window.location.search).get('view');
+
+  let query = sb.from('documents')
+    .select('*, projects(name, project_type)')
+    .eq('client_id', session.user.id)
+    .order('uploaded_at', { ascending: false });
+
+  // Apply view-specific filters
+  if (urlFilter === 'receipts') {
+    query = query.in('doc_type', ['invoice', 'receipt', 'statement', 'other']);
+  } else if (urlFilter === 'credits') {
+    query = query.not('suggested_irc_credit', 'is', null)
+                 .neq('suggested_irc_credit', 'none');
+  }
+
+  const { data: docs } = await query;
+
+  const tbody = document.querySelector('.docs-table-body') ||
+                document.getElementById('vault-docs-body');
+  if (!tbody || !docs) return;
+
+  // Update page heading based on filter
+  const headingEl = document.querySelector('.topbar-title');
+  if (headingEl) {
+    if (urlFilter === 'receipts') {
+      headingEl.innerHTML = 'Receipts &amp; invoices <span>All purchases · invoices · statements</span>';
+    } else if (urlFilter === 'credits') {
+      headingEl.innerHTML = 'Tax credits <span>IRC-matched documents · §25D · §25C · §30C</span>';
+    } else {
+      headingEl.innerHTML = 'Document vault <span>Encrypted · MFA protected</span>';
+    }
+  }
+
+  if (docs.length === 0) {
+    tbody.innerHTML = `<div style="padding:40px;text-align:center;color:var(--gray-400)">
+      <i class="fa-solid fa-file-arrow-up" style="font-size:28px;margin-bottom:10px;display:block"></i>
+      No documents yet — drag a file above to upload your first document.
+    </div>`;
+    return;
+  }
+
+  const typeMap = {
+    solar:    { cls:'dpt-solar',    icon:'fa-sun',                   label:'Solar' },
+    battery:  { cls:'dpt-battery',  icon:'fa-battery-three-quarters', label:'Battery' },
+    ev:       { cls:'dpt-ev',       icon:'fa-charging-station',       label:'EV Charger' },
+    contract: { cls:'dpt-contract', icon:'fa-file-signature',         label:'Contract' },
+  };
+  const statusMap = {
+    user_confirmed: `<span class="dsb-matched"><i class="fa-solid fa-circle-check" style="font-size:9px"></i> Confirmed</span>`,
+    ai_complete:    `<span class="dsb-matched"><i class="fa-solid fa-circle-check" style="font-size:9px"></i> AI matched</span>`,
+    pending:        `<span class="dsb-pending"><i class="fa-solid fa-clock" style="font-size:9px"></i> Pending</span>`,
+    on_file:        `<span class="dsb-onfile"><i class="fa-solid fa-folder" style="font-size:9px"></i> On file</span>`,
+  };
+
+  tbody.innerHTML = docs.map(doc => {
+    const pType = doc.projects?.project_type || 'contract';
+    const t = typeMap[pType] || typeMap.contract;
+    // Use original_filename as the real column name
+    const fname = doc.original_filename || doc.file_name || 'Document';
+    const ext = fname.split('.').pop().toLowerCase();
+    const iconCls = ['pdf'].includes(ext) ? 'pdf' : ['jpg','jpeg','png'].includes(ext) ? 'img' : 'doc';
+    const iconName = iconCls === 'pdf' ? 'fa-file-pdf' : iconCls === 'img' ? 'fa-image' : 'fa-file-word';
+    const status = statusMap[doc.classification_status] || statusMap.on_file;
+    const ircBadge = doc.suggested_irc_credit && doc.suggested_irc_credit !== 'none' ? `§${doc.suggested_irc_credit} ` : '';
+    const date = doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    const subtext = doc.equipment_type || doc.vendor_name || doc.purchase_amount || '—';
+
+    return `<div class="doc-row" data-project="${pType}" data-doc-id="${doc.id}" data-storage-path="${doc.storage_path || ''}">
+      <div class="doc-file-icon ${iconCls}"><i class="fa-solid ${iconName}"></i></div>
+      <div>
+        <div class="doc-name">${fname}</div>
+        <div class="doc-name-sub">${subtext}</div>
+      </div>
+      <span class="doc-project-tag ${t.cls}"><i class="fa-solid ${t.icon}" style="font-size:9px"></i> ${t.label}</span>
+      <div class="doc-date">${date}</div>
+      <span class="doc-status-badge">${ircBadge}${status}</span>
+      <button class="doc-action" onclick="openCtxMenu(event,this.closest('.doc-row'))"><i class="fa-solid fa-ellipsis"></i></button>
+    </div>`;
+  }).join('');
+}
+
+// ── SESSION MANAGEMENT ──────────────────────────────────────────
+const SESSION_TTL = 15 * 60; // 15 minutes in seconds
+const GRACE_PERIOD = 15 * 60; // same — on page load within grace, skip MFA
+let sessionExpiry = null;
+let sessionInterval = null;
+
+function startSession() {
+  sessionExpiry = Date.now() + SESSION_TTL * 1000;
+  localStorage.setItem('vault_session', sessionExpiry);
+  startSessionCountdown();
+}
+
+function extendSession() {
+  startSession();
+  showToast('Session extended by 15 minutes', 'success');
+}
+
+function checkExistingSession() {
+  const stored = localStorage.getItem('vault_session');
+  if (stored) {
+    const remaining = parseInt(stored) - Date.now();
+    if (remaining > 0) {
+      sessionExpiry = parseInt(stored);
+      startSessionCountdown();
+      return true;
+    }
+  }
+  return false;
+}
+
+function startSessionCountdown() {
+  clearInterval(sessionInterval);
+  const wrap = document.getElementById('session-timer-wrap');
+  const card = document.getElementById('session-timer-card');
+  const clock = document.getElementById('session-clock');
+  const badge = document.getElementById('session-badge');
+  const label = document.getElementById('session-label');
+
+  sessionInterval = setInterval(() => {
+    const remaining = Math.max(0, Math.floor((sessionExpiry - Date.now()) / 1000));
+    const mins = Math.floor(remaining / 60);
+    const secs = remaining % 60;
+    const formatted = `${mins}:${secs.toString().padStart(2,'0')}`;
+    clock.textContent = formatted;
+
+    if (remaining <= 0) {
+      clearInterval(sessionInterval);
+      localStorage.removeItem('vault_session');
+      // re-show gate
+      document.getElementById('vault-content').classList.remove('show');
+      document.getElementById('mfa-gate').classList.add('show');
+      startGateResend();
+      showToast('Session expired — please re-verify', 'error');
+      return;
+    }
+
+    if (remaining <= 120) {
+      wrap.classList.add('show');
+      card.classList.add('expiring');
+      badge.classList.add('expiring');
+      label.textContent = 'Session expiring';
+    } else if (remaining <= 300) {
+      wrap.classList.add('show');
+      card.classList.remove('expiring');
+      badge.classList.remove('expiring');
+      label.textContent = `${mins}m remaining`;
+    } else {
+      wrap.classList.remove('show');
+      badge.classList.remove('expiring');
+      label.textContent = 'Session secure';
+    }
+  }, 1000);
+}
+
+// reset session timer on any user activity
+['click','keydown','mousemove','scroll'].forEach(evt => {
+  document.addEventListener(evt, () => {
+    if (sessionExpiry && document.getElementById('vault-content').classList.contains('show')) {
+      sessionExpiry = Date.now() + SESSION_TTL * 1000;
+      localStorage.setItem('vault_session', sessionExpiry);
+    }
+  }, {passive: true});
+});
+
+// ── MFA GATE ───────────────────────────────────────────────────
+const gateInputs = document.querySelectorAll('[id^="g-otp-"]');
+gateInputs.forEach((inp, i) => {
+  inp.addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g,'');
+    if (this.value) {
+      this.classList.add('filled');
+      if (i < 5) gateInputs[i+1].focus();
+    } else {
+      this.classList.remove('filled');
+    }
+    if (Array.from(gateInputs).map(g=>g.value).join('').length === 6) verifyGateMFA();
+  });
+  inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && !this.value && i > 0) {
+      gateInputs[i-1].focus();
+      gateInputs[i-1].value = '';
+      gateInputs[i-1].classList.remove('filled');
+    }
+  });
+  inp.addEventListener('paste', function(e) {
+    e.preventDefault();
+    const paste = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+    paste.split('').forEach((ch,j) => {
+      if (gateInputs[j]) { gateInputs[j].value=ch; gateInputs[j].classList.add('filled'); }
+    });
+    if (paste.length===6) verifyGateMFA();
+  });
+});
+
+function verifyGateMFA() {
+  const code = Array.from(gateInputs).map(g=>g.value).join('');
+  if (code.length < 6) return;
+  const errEl = document.getElementById('gate-error');
+  errEl.classList.remove('show');
+  errEl.textContent = 'Incorrect code. Please try again.';
+
+  const btn = document.querySelector('.mfa-verify-btn');
+  btn.disabled = true;
+  const origHTML = btn.innerHTML;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying…';
+
+  // Ensure Supabase client exists
+  if (!window._vaultSb) {
+    window._vaultSb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, storageKey: 'solenetec_portal_session' }
+    });
+  }
+
+  (async () => {
+    try {
+      const sb = window._vaultSb;
+      const { data: { session }, error: sErr } = await sb.auth.getSession();
+      if (sErr || !session) throw new Error('Session expired — please sign in again.');
+
+      const { data: factors, error: fErr } = await sb.auth.mfa.listFactors();
+      if (fErr) throw fErr;
+
+      const totp = factors?.totp?.[0];
+      if (!totp) throw new Error('No authenticator enrolled. Set up MFA from your dashboard first.');
+
+      const { data: challenge, error: cErr } = await sb.auth.mfa.challenge({ factorId: totp.id });
+      if (cErr) throw cErr;
+
+      const { error: vErr } = await sb.auth.mfa.verify({
+        factorId: totp.id,
+        challengeId: challenge.id,
+        code
+      });
+      if (vErr) throw new Error('Incorrect code. Please check your authenticator app.');
+
+      // Refresh session to get AAL2 token after MFA verify
+      const { data: { session: aal2Session } } = await sb.auth.getSession();
+      if (aal2Session) {
+        // Store the refreshed AAL2 session explicitly
+        window._vaultSession = aal2Session;
+      }
+
+      // Success
+      document.getElementById('mfa-gate').classList.remove('show');
+      document.getElementById('vault-content').classList.add('show');
+      startSession();
+      showToast('Identity verified — vault unlocked', 'success');
+      loadVaultDocuments();
+
+    } catch(e) {
+      errEl.textContent = e.message;
+      errEl.classList.add('show');
+      gateInputs.forEach(g=>{ g.value=''; g.classList.remove('filled'); g.classList.add('error-state'); });
+      setTimeout(()=> gateInputs.forEach(g=>g.classList.remove('error-state')), 800);
+      gateInputs[0].focus();
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = origHTML;
+    }
+  })();
+}
+
+let gateResendInterval;
+function startGateResend() {
+  let s = 30;
+  const btn = document.getElementById('gate-resend');
+  const timer = document.getElementById('gate-timer');
+  btn.disabled = true;
+  clearInterval(gateResendInterval);
+  gateResendInterval = setInterval(()=>{
+    s--;
+    timer.textContent = s+'s';
+    if (s<=0) {
+      clearInterval(gateResendInterval);
+      btn.disabled = false;
+      btn.innerHTML = 'Resend code';
+    }
+  },1000);
+}
+
+// ── FILE UPLOAD ────────────────────────────────────────────────
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e=>{ e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e=>{ e.preventDefault(); dropZone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+
+function getFileIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  if (['pdf'].includes(ext)) return {cls:'qi-icon pdf',icon:'fa-solid fa-file-pdf'};
+  if (['jpg','jpeg','png','gif','webp'].includes(ext)) return {cls:'qi-icon img',icon:'fa-solid fa-image'};
+  if (['doc','docx'].includes(ext)) return {cls:'qi-icon doc',icon:'fa-solid fa-file-word'};
+  if (['xls','xlsx','csv'].includes(ext)) return {cls:'qi-icon xls',icon:'fa-solid fa-file-excel'};
+  return {cls:'qi-icon doc',icon:'fa-solid fa-file'};
+}
+
+function formatBytes(b) {
+  if (b < 1024) return b+'B';
+  if (b < 1048576) return (b/1024).toFixed(1)+'KB';
+  return (b/1048576).toFixed(1)+'MB';
+}
+
+let _currentFile = null;
+let _currentClassification = null;
+
+async function handleFiles(files) {
+  for (const file of Array.from(files)) {
+    if (file.size > 25*1024*1024) { showToast(`${file.name} exceeds 25 MB limit`, 'error'); continue; }
+    await realUpload(file);
+  }
+}
+
+async function realUpload(file) {
+  const queue = document.getElementById('upload-queue');
+  const {cls, icon} = getFileIcon(file.name);
+  const id = 'qi-'+Date.now()+Math.random().toString(36).slice(2);
+  const item = document.createElement('div');
+  item.className = 'queue-item'; item.id = id;
+  item.innerHTML = `
+    <div class="${cls}"><i class="${icon}"></i></div>
+    <div class="qi-progress">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span class="qi-name">${file.name}</span>
+        <span class="qi-size">${formatBytes(file.size)}</span>
+      </div>
+      <div class="qi-bar-wrap"><div class="qi-bar" id="bar-${id}" style="width:0%"></div></div>
+      <div class="qi-status" id="status-${id}">Uploading…</div>
+    </div>
+    <button class="qi-remove" onclick="removeQueueItem('${id}')"><i class="fa-solid fa-xmark"></i></button>`;
+  queue.appendChild(item);
+
+  const bar = document.getElementById(`bar-${id}`);
+  const statusEl = document.getElementById(`status-${id}`);
+
+  // Animate bar to 60% while uploading
+  let fakeProgress = 0;
+  const fakeInterval = setInterval(() => {
+    if (fakeProgress < 60) {
+      fakeProgress += Math.random() * 8 + 4;
+      bar.style.width = Math.min(fakeProgress, 60) + '%';
+      statusEl.textContent = `Uploading… ${Math.round(Math.min(fakeProgress, 60))}%`;
+    }
+  }, 150);
+
+  try {
+    const sb = window._vaultSb;
+    // Always get a fresh session to ensure AAL2 token is used
+    const { data: { session }, error: sessErr } = await sb.auth.getSession();
+    if (sessErr || !session) throw new Error('Session expired — please sign in again.');
+    const token = session.access_token;
+
+    // Build form data
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('client_id', session.user.id);
+    formData.append('project_id', window._vaultProjectId || '');
+
+    // POST to Worker /portal/upload
+    const response = await fetch('YOUR_CLOUDFLARE_WORKER_URL/portal/upload', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+
+    clearInterval(fakeInterval);
+    const result = await response.json();
+
+    if (!response.ok) throw new Error(result.error || 'Upload failed');
+
+    // Bar to 80% — now running AI
+    bar.style.width = '80%';
+    statusEl.textContent = 'Running malware scan…';
+    await new Promise(r => setTimeout(r, 600));
+
+    bar.style.width = '90%';
+    statusEl.textContent = 'Running AI extraction…';
+
+    // Convert file to base64 for Claude vision (much more accurate than text extraction)
+    let file_base64 = null;
+    let file_mime = file.type;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      // Build base64 in chunks to avoid stack overflow
+      let binary = '';
+      const chunkSize = 32768;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(i, Math.min(i + chunkSize, bytes.length)));
+      }
+      file_base64 = btoa(binary);
+    } catch(e) {
+      console.warn('Base64 conversion failed:', e.message);
+    }
+
+    // Also extract text as fallback
+    let extracted_text = `File: ${file.name}`;
+    try {
+      if (file.type === 'application/pdf') {
+        const arrayBuffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(arrayBuffer);
+        const parts = [];
+        const chunkSize = 32768;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+          parts.push(String.fromCharCode(...bytes.subarray(i, Math.min(i + chunkSize, bytes.length))));
+        }
+        const raw = parts.join('');
+        const parenMatches = raw.match(/\(([^)]{2,200})\)/g) || [];
+        const parenText = parenMatches
+          .map(m => m.slice(1,-1).replace(/\\[nrt]/g,' '))
+          .filter(t => /[a-zA-Z0-9$.,]/.test(t))
+          .join(' ').replace(/\s+/g,' ').trim();
+        const asciiText = raw.replace(/[^\x20-\x7E]/g,' ').replace(/\s+/g,' ').trim();
+        extracted_text = (parenText.length > 80 ? parenText : asciiText).slice(0, 5000);
+      }
+    } catch(e) { console.warn('Text extraction:', e.message); }
+
+    // Call AI classify — send base64 for vision analysis
+    let classification = {};
+    try {
+      const { data: { session: freshSess } } = await window._vaultSb.auth.getSession();
+      const classifyRes = await fetch('YOUR_CLOUDFLARE_WORKER_URL/portal/classify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${freshSess?.access_token || token}`
+        },
+        body: JSON.stringify({
+          file_id: result.file_id,
+          file_base64,
+          file_mime,
+          extracted_text
+        })
+      });
+      if (classifyRes.ok) {
+        const cd = await classifyRes.json();
+        const c = cd.classification || {};
+        classification = {
+          equipment: c.equipment_type   || '',
+          amount:    c.purchase_amount  ? c.purchase_amount.replace(/[^0-9.]/g,'') : '',
+          date:      c.purchase_date    || '',
+          vendor:    c.vendor_name      || '',
+          irc_code:  c.suggested_irc_credit !== 'none' ? c.suggested_irc_credit : '',
+          doctype:   c.doc_type || c.document_category || 'invoice',
+          confidence: Math.round((
+            (c.confidence_scores?.vendor || c.conf_vendor || 0) +
+            (c.confidence_scores?.amount || c.conf_amount || 0) +
+            (c.confidence_scores?.equipment_type || c.conf_equipment || 0) +
+            (c.confidence_scores?.irc_match || c.conf_irc || 0)
+          ) / 4)
+        };
+      }
+    } catch(e) { console.warn('Classify error:', e.message); }
+
+    bar.style.width = '100%';
+    bar.style.background = 'var(--green)';
+    statusEl.textContent = 'Upload complete — opening review…';
+    statusEl.style.color = 'var(--green)';
+
+    _currentFile = { ...result, document_id: result.file_id, file };
+    _currentClassification = classification;
+
+    setTimeout(() => { item.remove(); openConfirmDrawer(file, result, classification); }, 1000);
+
+  } catch(e) {
+    clearInterval(fakeInterval);
+    bar.style.background = 'var(--red)';
+    statusEl.textContent = 'Error: ' + e.message;
+    statusEl.style.color = 'var(--red)';
+    showToast(e.message, 'error');
+    setTimeout(() => item.remove(), 3000);
+  }
+}
+
+function removeQueueItem(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ── CONFIRMATION DRAWER ────────────────────────────────────────
+async function openConfirmDrawer(file, uploadResult, classification) {
+  const {cls, icon} = getFileIcon(file.name);
+  const fpIcon = document.getElementById('drawer-fp-icon');
+  fpIcon.className = `fp-icon ${cls.replace('qi-icon ','fi-')}`;
+  fpIcon.innerHTML = `<i class="${icon}"></i>`;
+  document.getElementById('drawer-fp-name').textContent = file.name;
+  document.getElementById('drawer-fp-meta').textContent =
+    `${file.name.split('.').pop().toUpperCase()} · ${formatBytes(file.size)}`;
+
+  // Populate AI fields from classification result
+  const c = classification || {};
+  document.getElementById('drawer-equipment').value = c.equipment || '';
+  document.getElementById('drawer-amount').value    = c.amount    ? '$' + Number(c.amount).toLocaleString('en-US', {minimumFractionDigits:2}) : '';
+  document.getElementById('drawer-date').value      = c.date      || '';
+  document.getElementById('drawer-vendor').value    = c.vendor    || '';
+
+  // IRC credit
+  const ircCode = (c.irc_code || '').replace('§','').toUpperCase();
+  const creditMap = {
+    '25D': { label: '§25D Residential clean energy', rate: 0.30, desc: 'Residential clean energy credit<br><strong>30%</strong> of eligible cost' },
+    '25C': { label: '§25C Home improvement',         rate: 0.30, desc: 'Home improvement credit<br><strong>30%</strong> of eligible cost' },
+    '30C': { label: '§30C EV refueling property',    rate: 0.30, desc: 'EV refueling property credit<br><strong>30%</strong> of eligible cost' },
+    '48':  { label: '§48 Commercial ITC',            rate: 0.30, desc: 'Commercial investment tax credit<br><strong>30%</strong> of eligible cost' },
+  };
+  const credit = creditMap[ircCode];
+  if (credit && c.amount) {
+    const creditAmt = (Number(c.amount) * credit.rate).toFixed(0);
+    document.getElementById('drawer-credit-code').textContent   = '§' + ircCode;
+    document.getElementById('drawer-credit-text').innerHTML     = credit.desc;
+    document.getElementById('drawer-credit-amount').textContent = '$' + Number(creditAmt).toLocaleString();
+  } else {
+    document.getElementById('drawer-credit-code').textContent   = '—';
+    document.getElementById('drawer-credit-text').textContent   = 'No IRC credit matched';
+    document.getElementById('drawer-credit-amount').textContent = '';
+  }
+
+  // Confidence display with nudge for low confidence
+  const conf = c.confidence || 0;
+  const confEl = document.getElementById('drawer-conf-text');
+  if (conf >= 85) {
+    confEl.textContent = `High confidence — ${conf}% match on equipment type and cost`;
+    confEl.closest('.ai-confidence')?.classList.remove('low-conf');
+  } else if (conf >= 60) {
+    confEl.textContent = `Medium confidence — ${conf}% — please review the fields below`;
+    confEl.closest('.ai-confidence')?.classList.remove('low-conf');
+  } else if (conf > 0) {
+    confEl.textContent = `Low confidence — ${conf}% — the AI couldn't fully read this document`;
+    confEl.closest('.ai-confidence')?.classList.add('low-conf');
+    // Show nudge message
+    const nudge = document.getElementById('drawer-nudge');
+    if (nudge) nudge.style.display = 'block';
+  } else {
+    confEl.textContent = `Review fields below — please fill in the details manually`;
+    confEl.closest('.ai-confidence')?.classList.add('low-conf');
+    const nudge = document.getElementById('drawer-nudge');
+    if (nudge) nudge.style.display = 'block';
+  }
+
+  // Reset nudge visibility
+  const nudgeEl = document.getElementById('drawer-nudge');
+  if (nudgeEl) nudgeEl.style.display = 'none';
+
+  // Load real projects into dropdown
+  const projectSel = document.getElementById('drawer-project');
+  if (projectSel) {
+    try {
+      const { data: { session: s } } = await window._vaultSb.auth.getSession();
+      const { data: projects } = await window._vaultSb
+        .from('projects').select('id, name, project_type').eq('client_id', s.user.id);
+      projectSel.innerHTML = '<option value="">— Select project —</option>';
+      (projects || []).forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name;
+        if (p.id === window._vaultProjectId) opt.selected = true;
+        projectSel.appendChild(opt);
+      });
+      // Add "Other / Not listed" option
+      const other = document.createElement('option');
+      other.value = 'other';
+      other.textContent = '+ Other / Not listed';
+      projectSel.appendChild(other);
+    } catch(e) { console.warn('Could not load projects:', e.message); }
+  }
+
+  setTimeout(() => {
+    document.getElementById('drawer-overlay').classList.add('show');
+  }, 300);
+}
+
+function closeDrawer() {
+  document.getElementById('drawer-overlay').classList.remove('show');
+}
+
+async function confirmUpload() {
+  const sb = window._vaultSb;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session || !_currentFile) { closeDrawer(); return; }
+
+  try {
+    // Save classification edits back to documents table
+    const projectSel = document.getElementById('drawer-project').value;
+    const doctype    = document.getElementById('drawer-doctype')?.value || 'invoice';
+    const equipment  = document.getElementById('drawer-equipment').value;
+    const amountRaw  = document.getElementById('drawer-amount').value.replace(/[^0-9.]/g,'');
+    const date       = document.getElementById('drawer-date').value;
+    const vendor     = document.getElementById('drawer-vendor').value;
+    // Use IRC from classification or from drawer if user changed it
+    const ircCode = (_currentClassification?.irc_code || '').replace('§','').toUpperCase() || null;
+
+    if (!_currentFile?.document_id) throw new Error('No document ID — please try uploading again.');
+
+    const { error } = await sb.from('documents').update({
+      project_id:            (projectSel && projectSel !== 'other') ? projectSel : null,
+      doc_type:              doctype,
+      equipment_type:        equipment  || null,
+      purchase_amount:       amountRaw  || null,
+      purchase_date:         date       || null,
+      vendor_name:           vendor     || null,
+      suggested_irc_credit:  ircCode    || null,
+      irc_credit_confirmed:  ircCode    || null,
+      classification_status: ircCode ? 'user_confirmed' : 'ai_complete',
+      user_confirmed_at:     new Date().toISOString(),
+      updated_at:            new Date().toISOString()
+    }).eq('id', _currentFile.document_id);
+
+    if (error) throw error;
+
+    closeDrawer();
+    showToast('Document saved — AI credit matching complete', 'success');
+    document.getElementById('file-input').value = '';
+    _currentFile = null;
+    _currentClassification = null;
+    loadVaultDocuments();
+
+  } catch(e) {
+    showToast('Error saving document: ' + e.message, 'error');
+  }
+}
+
+function openDocDetail(row) {
+  openCE(row);
+}
+
+// ── CONTEXT MENU ───────────────────────────────────────────────
+let ctxTargetRow = null;
+const ctxMenu = document.getElementById('ctx-menu');
+
+function openCtxMenu(e, row) {
+  e.stopPropagation();
+  ctxTargetRow = row;
+  const rect = e.currentTarget.getBoundingClientRect();
+  ctxMenu.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
+  ctxMenu.style.left = (rect.right - 180) + 'px';
+  ctxMenu.style.position = 'absolute';
+  ctxMenu.classList.add('show');
+}
+
+document.addEventListener('click', () => ctxMenu.classList.remove('show'));
+
+function ctxEdit()     { ctxMenu.classList.remove('show'); if(ctxTargetRow) openCE(ctxTargetRow); }
+function ctxView()     { ctxMenu.classList.remove('show'); showToast('Document viewer coming soon', 'success'); }
+function ctxDownload() {
+  ctxMenu.classList.remove('show');
+  if (!ctxTargetRow) return;
+  const storagePath = ctxTargetRow.dataset.storagePath;
+  const fname = ctxTargetRow.querySelector('.doc-name')?.textContent || 'document';
+  if (!storagePath) { showToast('Download path not found', 'error'); return; }
+  (async () => {
+    try {
+      const { data, error } = await window._vaultSb.storage
+        .from('portal-documents')
+        .createSignedUrl(storagePath, 60);
+      if (error) throw error;
+      const a = document.createElement('a');
+      a.href = data.signedUrl;
+      a.download = fname;
+      a.target = '_blank';
+      a.click();
+      showToast('Download starting…', 'success');
+    } catch(e) { showToast('Download error: ' + e.message, 'error'); }
+  })();
+}
+function ctxHistory()  { ctxMenu.classList.remove('show'); if(ctxTargetRow) { openCE(ctxTargetRow); setTimeout(()=>{ document.getElementById('ce-audit-trail')?.scrollIntoView({behavior:'smooth'}); },400); } }
+function ctxDelete() {
+  ctxMenu.classList.remove('show');
+  if (!ctxTargetRow) return;
+  const docId = ctxTargetRow.dataset.docId;
+  const storagePath = ctxTargetRow.dataset.storagePath;
+  const fname = ctxTargetRow.querySelector('.doc-name')?.textContent || 'this document';
+  if (!docId) { showToast('Cannot identify document', 'error'); return; }
+
+  // Confirm before deleting
+  if (!confirm(`Remove "${fname}" from the vault?\n\nThis cannot be undone.`)) return;
+
+  (async () => {
+    try {
+      const sb = window._vaultSb;
+      // 1. Delete from Supabase Storage
+      if (storagePath) {
+        await sb.storage.from('portal-documents').remove([storagePath]);
+      }
+      // 2. Delete from documents table
+      const { error } = await sb.from('documents').delete().eq('id', docId);
+      if (error) throw error;
+      // 3. Remove row from UI immediately
+      ctxTargetRow.remove();
+      ctxTargetRow = null;
+      showToast(`"${fname}" removed from vault`, 'error');
+    } catch(e) { showToast('Delete error: ' + e.message, 'error'); }
+  })();
+}
+
+// ── CLASSIFICATION EDITOR ──────────────────────────────────────
+const DOC_DATA = [
+  { name:'Enphase IQ8M purchase receipt',     sub:'$28,400 · Sunrun San Diego',          raw:'SUNRUN *SOLAR 03/14/25  $28,400.00',           equipment:'Enphase IQ8M Solar Panels — 24 units', amount:'$28,400.00', date:'March 14, 2025',  vendor:'Sunrun San Diego',    project:'solar',   irc:'25d', doctype:'invoice',  notes:'Visa card charge from Sunrun — confirmed solar panel purchase per contract Jan 6, 2025', conf:[92,100,88,94] },
+  { name:'Permit approval — City of San Diego',sub:'Building permit #SD-2025-04821',       raw:'PERMIT #SD-2025-04821  CITY OF SAN DIEGO',    equipment:'Building permit — solar install',       amount:'$450.00',   date:'February 3, 2025',vendor:'City of San Diego',   project:'solar',   irc:'none',doctype:'permit',   notes:'', conf:[98,100,95,0] },
+  { name:'PTO letter — SDG&E interconnection', sub:'Permission to operate · System live',  raw:'PERMISSION TO OPERATE — SDGE ACCT #882341',   equipment:'PTO / Interconnection approval',        amount:'$0.00',     date:'April 1, 2025',   vendor:'SDG&E',               project:'solar',   irc:'none',doctype:'permit',   notes:'Permission to operate — system went live April 1, 2025', conf:[100,100,100,0] },
+  { name:'Enphase IQ 5P battery invoice',      sub:'$14,200 · 2 units',                    raw:'ENPHASE ENERGY  INV#ENP-2025-09882  $14,200', equipment:'Enphase IQ 5P Battery — 2 units',       amount:'$14,200.00', date:'October 4, 2025', vendor:'Enphase Energy / Solenetec', project:'battery', irc:'25d', doctype:'invoice',  notes:'Battery storage purchase — qualifies for §25D residential clean energy credit', conf:[99,100,96,91] },
+  { name:'SGIP rebate application',            sub:'Self-Generation Incentive Program · CA',raw:'SGIP APPLICATION  CPUC PROGRAM  REF#SGIP-2025-44821', equipment:'Battery storage rebate application', amount:'$0.00',  date:'October 10, 2025',vendor:'CPUC / SGIP Program',  project:'battery', irc:'none',doctype:'rebate',   notes:'SGIP application submitted for Enphase IQ 5P. Estimated rebate $3,600. Pending CPUC review.', conf:[95,100,90,0] },
+  { name:'EV charger quote — Enphase IQ 2',    sub:'$1,850 estimate · 48A Level 2',        raw:'ENPHASE IQ EV CHARGER 2  QUOTE #EV-2026-0041  $1,850', equipment:'Enphase IQ EV Charger 2 — Level 2 48A', amount:'$1,850.00', date:'March 2, 2026', vendor:'Solenetec',        project:'ev',      irc:'30c', doctype:'invoice',  notes:'Quote only — not yet purchased. Pending installation Q3 2026.', conf:[90,100,85,82] },
+  { name:'Solenetec installation agreement',   sub:'Signed · Solar + Battery scope',       raw:'INSTALLATION AGREEMENT  SOLENETEC LLC  JAN 06 2025', equipment:'Installation contract — Solar + Battery', amount:'$42,600.00',date:'January 6, 2025', vendor:'Solenetec LLC',      project:'solar',   irc:'none',doctype:'contract', notes:'Master installation agreement covering 9.6kW solar and Enphase IQ 5P battery', conf:[100,100,100,0] },
+  { name:'Warranty certificate — Enphase 25yr',sub:'Product + labor warranty',             raw:'ENPHASE WARRANTY CERTIFICATE  25-YEAR  SN#EIQ8M-29941', equipment:'Enphase 25-year product + labor warranty', amount:'$0.00', date:'April 1, 2025', vendor:'Enphase Energy',    project:'contract',irc:'none',doctype:'warranty', notes:'25-year product warranty + 10-year labor warranty for Enphase IQ8M panels', conf:[100,100,100,0] },
+];
+
+let ceRowIndex = -1;
+
+function openCE(row) {
+  const rows = Array.from(document.querySelectorAll('.doc-row'));
+  ceRowIndex = rows.indexOf(row);
+  const data = DOC_DATA[ceRowIndex] || DOC_DATA[0];
+
+  document.getElementById('ce-doc-title').textContent = data.name;
+  document.getElementById('ce-raw-text').textContent  = data.raw;
+  document.getElementById('ce-equipment').value       = data.equipment;
+  document.getElementById('ce-amount').value          = data.amount;
+  document.getElementById('ce-date').value            = data.date;
+  document.getElementById('ce-vendor').value          = data.vendor;
+  document.getElementById('ce-project').value         = data.project;
+  document.getElementById('ce-irc').value             = data.irc;
+  document.getElementById('ce-doctype').value         = data.doctype;
+  document.getElementById('ce-notes').value           = data.notes;
+
+  // confidence bars
+  const fields = ['conf-vendor','conf-amount','conf-equip','conf-irc'];
+  const colors = v => v >= 85 ? '#15803d' : v >= 65 ? '#d97706' : '#dc2626';
+  fields.forEach((id, i) => {
+    const bar = document.getElementById(id);
+    const pct = document.getElementById(id)?.nextElementSibling;
+    if (bar) {
+      bar.style.width   = data.conf[i] + '%';
+      bar.style.background = colors(data.conf[i]);
+    }
+  });
+  // update pct labels
+  const confRows = document.querySelectorAll('.ce-conf-row');
+  confRows.forEach((r, i) => {
+    const pctEl = r.querySelector('.ce-conf-pct');
+    if (pctEl) {
+      pctEl.textContent = data.conf[i] + '%';
+      pctEl.style.color = colors(data.conf[i]);
+    }
+  });
+
+  document.getElementById('ce-overlay').classList.add('show');
+}
+
+function closeCE(e) {
+  if (e.target === document.getElementById('ce-overlay')) closeCEBtn();
+}
+function closeCEBtn() {
+  document.getElementById('ce-overlay').classList.remove('show');
+}
+
+function saveCE() {
+  // mark edited fields as user-confirmed
+  ['ce-equip-tag','ce-date-tag','ce-vendor-tag','ce-proj-tag','ce-irc-tag'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = 'User'; el.className = 'ce-tag ce-tag-user'; }
+  });
+  closeCEBtn();
+  showToast('Classification saved — credit report updated', 'success');
+}
+
+// ── FILTER & SEARCH ────────────────────────────────────────────
+let activeFilter = 'all';
+document.querySelectorAll('.fp').forEach(pill=>{
+  pill.addEventListener('click',function(){
+    document.querySelectorAll('.fp').forEach(p=>p.classList.remove('active'));
+    this.classList.add('active');
+    activeFilter = this.dataset.filter;
+    applyFilters();
+  });
+});
+
+function filterDocs(q) { applyFilters(q); }
+
+function applyFilters(q) {
+  const query = (q||document.getElementById('search-input').value).toLowerCase();
+  document.querySelectorAll('.doc-row').forEach(row=>{
+    const matchFilter = activeFilter==='all' || row.dataset.project===activeFilter;
+    const matchSearch = !query || row.textContent.toLowerCase().includes(query);
+    row.classList.toggle('hidden', !(matchFilter && matchSearch));
+  });
+}
+
+// ── EXPORT (demo) ──────────────────────────────────────────────
+function exportReport() {
+  showToast('Generating CPA-ready PDF report…', 'success');
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  const icon = t.querySelector('i');
+  t.className = `toast ${type}`;
+  icon.className = type==='success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// ── INIT ───────────────────────────────────────�
+// ── PAGE INIT ──────────────────────────────────────────────────
+// Gate resend and session are now handled in the load event above
+
+</script>
+</body>
+</html>

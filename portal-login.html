@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Solenetec Client Portal — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root {
+    --blue:        #1a56db;
+    --blue-lt:     #eff4ff;
+    --blue-mid:    #dbeafe;
+    --blue-dark:   #1e40af;
+    --blue-darker: #1e3a8a;
+    --gray-50:     #f7f8fa;
+    --gray-100:    #f0f2f5;
+    --gray-200:    #e8eaed;
+    --gray-300:    #d1d5db;
+    --gray-400:    #9ca3af;
+    --gray-500:    #6b7280;
+    --gray-700:    #374151;
+    --gray-800:    #1f2937;
+    --gray-900:    #111827;
+    --green:       #15803d;
+    --green-lt:    #dcfce7;
+    --red:         #dc2626;
+    --red-lt:      #fef2f2;
+    --amber:       #d97706;
+    --amber-lt:    #fef3c7;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* ══ LEFT PANEL ══════════════════════════════════════════════ */
+  .left-panel {
+    background: var(--blue-darker);
+    display: flex;
+    flex-direction: column;
+    padding: 48px 52px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* subtle grid texture */
+  .left-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+
+  /* glow orb */
+  .left-panel::after {
+    content: '';
+    position: absolute;
+    width: 480px; height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,.18) 0%, transparent 70%);
+    top: -80px; right: -120px;
+    pointer-events: none;
+  }
+
+  .left-brand {
+    display: flex; align-items: center; gap: 12px;
+    position: relative; z-index: 1;
+    margin-bottom: auto;
+  }
+  .left-brand-mark {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .left-brand-mark i { color: #fff; font-size: 16px; }
+  .left-brand-text { display: flex; flex-direction: column; }
+  .left-brand-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700; font-size: 17px; color: #fff;
+    line-height: 1;
+  }
+  .left-brand-sub { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 3px; }
+
+  .left-content {
+    position: relative; z-index: 1;
+    flex: 1;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 48px 0 32px;
+  }
+
+  .left-eyebrow {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: rgba(147,197,253,1);
+    margin-bottom: 14px;
+  }
+
+  .left-headline {
+    font-family: 'Outfit', sans-serif;
+    font-size: 32px; font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 18px;
+  }
+  .left-headline span { color: #93c5fd; }
+
+  .left-body {
+    font-size: 14px; color: rgba(255,255,255,.6);
+    line-height: 1.7; max-width: 360px;
+    margin-bottom: 40px;
+  }
+
+  .feature-list { display: flex; flex-direction: column; gap: 14px; }
+  .feature-item {
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .feature-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.1);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .feature-icon i { font-size: 13px; color: #93c5fd; }
+  .feature-text { display: flex; flex-direction: column; gap: 2px; }
+  .feature-title { font-size: 13px; font-weight: 600; color: #fff; }
+  .feature-desc { font-size: 11px; color: rgba(255,255,255,.5); line-height: 1.5; }
+
+  .left-footer {
+    position: relative; z-index: 1;
+    font-size: 11px; color: rgba(255,255,255,.3);
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding-top: 20px;
+    display: flex; gap: 20px;
+  }
+  .left-footer a { color: rgba(255,255,255,.4); text-decoration: none; }
+  .left-footer a:hover { color: rgba(255,255,255,.7); }
+
+  /* ══ RIGHT PANEL ══════════════════════════════════════════════ */
+  .right-panel {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 48px 52px;
+    background: #fff;
+  }
+
+  .form-wrap {
+    width: 100%; max-width: 380px;
+  }
+
+  /* VIEW MANAGEMENT */
+  .view { display: none; flex-direction: column; gap: 0; }
+  .view.active { display: flex; }
+
+  /* ── shared form elements ── */
+  .form-heading {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px; font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 6px;
+  }
+  .form-subheading {
+    font-size: 13px; color: var(--gray-500);
+    line-height: 1.6; margin-bottom: 28px;
+  }
+  .form-subheading strong { color: var(--gray-700); font-weight: 500; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+  .field label { font-size: 12px; font-weight: 600; color: var(--gray-700); }
+
+  .input-wrap { position: relative; }
+  .input-wrap i.input-icon {
+    position: absolute; left: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400); font-size: 13px;
+    pointer-events: none;
+  }
+  .input-wrap input {
+    width: 100%;
+    height: 42px;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 0 40px 0 38px;
+    font-size: 13px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    transition: border-color .15s, background .15s, box-shadow .15s;
+    outline: none;
+  }
+  .input-wrap input:focus {
+    border-color: var(--blue);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(26,86,219,.1);
+  }
+  .input-wrap input.error { border-color: var(--red); background: var(--red-lt); }
+  .input-wrap input.error:focus { box-shadow: 0 0 0 3px rgba(220,38,38,.1); }
+
+  .toggle-pw {
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: var(--gray-400); font-size: 13px; padding: 2px;
+    transition: color .12s;
+  }
+  .toggle-pw:hover { color: var(--gray-600); }
+
+  .field-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .remember-wrap { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+  .remember-wrap input[type=checkbox] {
+    width: 15px; height: 15px;
+    accent-color: var(--blue);
+    cursor: pointer;
+  }
+  .remember-label { font-size: 12px; color: var(--gray-600); cursor: pointer; }
+  .link-btn {
+    font-size: 12px; color: var(--blue); font-weight: 500;
+    background: none; border: none; cursor: pointer;
+    padding: 0; transition: color .12s;
+  }
+  .link-btn:hover { color: var(--blue-dark); text-decoration: underline; }
+
+  .error-msg {
+    display: none;
+    background: var(--red-lt);
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px; color: var(--red);
+    margin-bottom: 16px;
+    align-items: center; gap: 8px;
+  }
+  .error-msg.show { display: flex; }
+
+  .primary-btn {
+    width: 100%; height: 44px;
+    background: var(--blue);
+    color: #fff;
+    border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background .15s, transform .1s;
+    margin-bottom: 20px;
+  }
+  .primary-btn:hover { background: var(--blue-dark); }
+  .primary-btn:active { transform: scale(.98); }
+  .primary-btn:disabled { background: var(--gray-300); cursor: not-allowed; transform: none; }
+  .primary-btn .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .divider-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+  }
+  .divider-line { flex: 1; height: 1px; background: var(--gray-200); }
+  .divider-text { font-size: 11px; color: var(--gray-400); white-space: nowrap; }
+
+  .magic-btn {
+    width: 100%; height: 42px;
+    background: #fff;
+    color: var(--gray-700);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background .12s, border-color .12s;
+    margin-bottom: 20px;
+  }
+  .magic-btn:hover { background: var(--gray-50); border-color: var(--gray-300); }
+
+  .form-footer {
+    text-align: center;
+    font-size: 12px; color: var(--gray-400);
+  }
+  .form-footer a, .form-footer button {
+    color: var(--blue); font-weight: 500;
+    text-decoration: none; background: none; border: none;
+    cursor: pointer; font-size: 12px; font-family: inherit;
+  }
+  .form-footer a:hover, .form-footer button:hover { text-decoration: underline; }
+
+  /* ── MFA view ── */
+  .mfa-icon-wrap {
+    width: 56px; height: 56px;
+    background: var(--blue-lt);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .mfa-icon-wrap i { font-size: 22px; color: var(--blue); }
+
+  .otp-row { display: flex; gap: 8px; margin-bottom: 20px; }
+  .otp-input {
+    flex: 1; height: 52px;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 20px; font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    color: var(--gray-900);
+    background: var(--gray-50);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    caret-color: var(--blue);
+  }
+  .otp-input:focus {
+    border-color: var(--blue);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(26,86,219,.1);
+  }
+  .otp-input.filled { border-color: var(--blue); background: var(--blue-lt); color: var(--blue-dark); }
+
+  .resend-row {
+    text-align: center;
+    font-size: 12px; color: var(--gray-400);
+    margin-bottom: 20px;
+  }
+  .resend-row button {
+    color: var(--blue); font-weight: 500;
+    background: none; border: none; cursor: pointer;
+    font-size: 12px; font-family: inherit;
+  }
+  .resend-row button:disabled { color: var(--gray-400); cursor: default; }
+
+  /* ── magic link sent view ── */
+  .success-icon-wrap {
+    width: 56px; height: 56px;
+    background: var(--green-lt);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .success-icon-wrap i { font-size: 22px; color: var(--green); }
+
+  /* ── forgot password view ── */
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--gray-500);
+    background: none; border: none; cursor: pointer;
+    padding: 0; margin-bottom: 24px;
+    font-family: inherit;
+    transition: color .12s;
+  }
+  .back-btn:hover { color: var(--gray-800); }
+
+  /* ── security note ── */
+  .security-note {
+    display: flex; align-items: flex-start; gap: 9px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 4px;
+  }
+  .security-note i { color: var(--gray-400); font-size: 12px; margin-top: 1px; flex-shrink: 0; }
+  .security-note span { font-size: 11px; color: var(--gray-500); line-height: 1.55; }
+
+  /* ── animations ── */
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+  .view.active { animation: fadeIn .22s ease both; }
+
+  /* ── resend timer ── */
+  #resend-timer { font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 720px) {
+    body { grid-template-columns: 1fr; }
+    .left-panel { display: none; }
+    .right-panel { padding: 40px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ LEFT PANEL ════════════════════════════════════════════════ -->
+<div class="left-panel">
+  <div class="left-brand">
+    <div class="left-brand-mark"><i class="fa-solid fa-bolt"></i></div>
+    <div class="left-brand-text">
+      <div class="left-brand-name">Solenetec</div>
+      <div class="left-brand-sub">Client Portal</div>
+    </div>
+  </div>
+
+  <div class="left-content">
+    <div class="left-eyebrow">Your project, your credits</div>
+    <div class="left-headline">Everything about<br>your installation<br><span>in one place.</span></div>
+    <div class="left-body">
+      Track every milestone, store your documents securely, and let Solen AI automatically match your receipts to the IRS credits you've earned.
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feature-icon"><i class="fa-solid fa-list-check"></i></div>
+        <div class="feature-text">
+          <div class="feature-title">Live project milestones</div>
+          <div class="feature-desc">Permit, install, inspection, PTO — updated in real time</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><i class="fa-solid fa-vault"></i></div>
+        <div class="feature-text">
+          <div class="feature-title">Secure document vault</div>
+          <div class="feature-desc">Receipts, contracts, warranties — encrypted and organized</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div class="feature-text">
+          <div class="feature-title">IRS credit matching</div>
+          <div class="feature-desc">AI maps your purchases to §25D, §30C, §25C automatically</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="left-footer">
+    <span>&copy; 2026 Solenetec</span>
+    <a href="#">Privacy policy</a>
+    <a href="#">Terms of use</a>
+    <a href="#">Support</a>
+  </div>
+</div>
+
+<!-- ══ RIGHT PANEL ════════════════════════════════════════════════ -->
+<div class="right-panel">
+  <div class="form-wrap">
+
+    <!-- ── VIEW 1: Sign in ─────────────────────────────── -->
+    <div class="view active" id="view-signin">
+      <div class="form-heading">Sign in</div>
+      <div class="form-subheading">Welcome back. Enter your credentials to access your project portal.</div>
+
+      <div class="error-msg" id="signin-error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="signin-error-text">Incorrect email or password. Please try again.</span>
+      </div>
+
+      <div class="field">
+        <label for="email">Email address</label>
+        <div class="input-wrap">
+          <i class="fa-regular fa-envelope input-icon"></i>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password"/>
+          <button class="toggle-pw" id="toggle-pw" type="button" tabindex="-1">
+            <i class="fa-regular fa-eye" id="pw-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label class="remember-wrap">
+          <input type="checkbox" id="remember"/>
+          <span class="remember-label">Keep me signed in</span>
+        </label>
+        <button class="link-btn" onclick="showView('view-forgot')">Forgot password?</button>
+      </div>
+
+      <button class="primary-btn" id="signin-btn" onclick="handleSignIn()">
+        <span class="spinner" id="signin-spinner"></span>
+        <span id="signin-btn-text">Sign in to portal</span>
+      </button>
+
+      <div class="divider-row">
+        <div class="divider-line"></div>
+        <div class="divider-text">or sign in without a password</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <button class="magic-btn" onclick="showView('view-magic-form')">
+        <i class="fa-solid fa-paper-plane" style="color:var(--blue);font-size:13px"></i>
+        Send me a magic link
+      </button>
+
+      <div class="security-note">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Your portal is protected with 256-bit encryption and multi-factor authentication. All documents are stored securely and never shared.</span>
+      </div>
+    </div>
+
+    <!-- ── VIEW 2: MFA ─────────────────────────────────── -->
+    <div class="view" id="view-mfa">
+      <div class="mfa-icon-wrap">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+      </div>
+      <div class="form-heading">Two-factor auth</div>
+      <div class="form-subheading">We sent a 6-digit code to <strong id="mfa-email-display">your email</strong>. Enter it below to continue.</div>
+
+      <div class="error-msg" id="mfa-error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>Incorrect code. Please check and try again.</span>
+      </div>
+
+      <div class="otp-row">
+        <input class="otp-input" id="otp-0" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input class="otp-input" id="otp-1" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input class="otp-input" id="otp-2" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input class="otp-input" id="otp-3" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input class="otp-input" id="otp-4" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input class="otp-input" id="otp-5" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      </div>
+
+      <div class="resend-row">
+        Didn't receive it? <button id="resend-btn" onclick="startResendTimer()" disabled>Resend in <span id="resend-timer">30s</span></button>
+      </div>
+
+      <button class="primary-btn" id="mfa-btn" onclick="handleMFA()">
+        <span class="spinner" id="mfa-spinner"></span>
+        <span id="mfa-btn-text">Verify &amp; sign in</span>
+      </button>
+
+      <div class="form-footer">
+        <button onclick="showView('view-signin')">← Back to sign in</button>
+      </div>
+    </div>
+
+    <!-- ── VIEW 3: Magic link form ─────────────────────── -->
+    <div class="view" id="view-magic-form">
+      <button class="back-btn" onclick="showView('view-signin')">
+        <i class="fa-solid fa-arrow-left"></i> Back
+      </button>
+      <div class="form-heading">Magic link</div>
+      <div class="form-subheading">Enter your email and we'll send you a secure one-time sign-in link. No password needed.</div>
+
+      <div class="field">
+        <label for="magic-email">Email address</label>
+        <div class="input-wrap">
+          <i class="fa-regular fa-envelope input-icon"></i>
+          <input type="email" id="magic-email" placeholder="you@example.com"/>
+        </div>
+      </div>
+
+      <button class="primary-btn" onclick="handleMagicLink()">
+        <span class="spinner" id="magic-spinner"></span>
+        <span id="magic-btn-text">Send magic link</span>
+      </button>
+    </div>
+
+    <!-- ── VIEW 4: Magic link sent ─────────────────────── -->
+    <div class="view" id="view-magic-sent">
+      <div class="success-icon-wrap">
+        <i class="fa-solid fa-envelope-circle-check"></i>
+      </div>
+      <div class="form-heading">Check your inbox</div>
+      <div class="form-subheading">We sent a secure sign-in link to <strong id="magic-email-display">your email</strong>. The link expires in 15 minutes.</div>
+
+      <div class="security-note" style="margin-bottom:20px">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>If you don't see the email, check your spam folder. Links are sent from <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="89f9e6fbfde8e5c9fae6e5ece7ecfdeceaa7eae6e4">[email&#160;protected]</a></strong> and expire after one use.</span>
+      </div>
+
+      <div class="form-footer">
+        Sent to the wrong address? <button onclick="showView('view-magic-form')">Try again</button>
+      </div>
+    </div>
+
+    <!-- ── VIEW 5: Forgot password ─────────────────────── -->
+    <div class="view" id="view-forgot">
+      <button class="back-btn" onclick="showView('view-signin')">
+        <i class="fa-solid fa-arrow-left"></i> Back to sign in
+      </button>
+      <div class="form-heading">Reset password</div>
+      <div class="form-subheading">Enter your email address and we'll send you a link to reset your password.</div>
+
+      <div class="field">
+        <label for="reset-email">Email address</label>
+        <div class="input-wrap">
+          <i class="fa-regular fa-envelope input-icon"></i>
+          <input type="email" id="reset-email" placeholder="you@example.com"/>
+        </div>
+      </div>
+
+      <button class="primary-btn" onclick="handleForgotPassword()">
+        <span class="spinner" id="reset-spinner"></span>
+        <span id="reset-btn-text">Send reset link</span>
+      </button>
+    </div>
+
+    <!-- ── VIEW 6: Reset sent ──────────────────────────── -->
+    <div class="view" id="view-reset-sent">
+      <div class="success-icon-wrap">
+        <i class="fa-solid fa-envelope-circle-check"></i>
+      </div>
+      <div class="form-heading">Reset link sent</div>
+      <div class="form-subheading">We sent a password reset link to <strong id="reset-email-display">your email</strong>. Follow the instructions to set a new password.</div>
+
+      <div class="security-note" style="margin-bottom:20px">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Reset links expire after 1 hour. If you don't receive an email within a few minutes, contact <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0e7d7b7e7e617c7a4e7d61626b606b7a6b6d206d6163">[email&#160;protected]</a></strong></span>
+      </div>
+
+      <div class="form-footer">
+        <button onclick="showView('view-signin')">← Back to sign in</button>
+      </div>
+    </div>
+
+    <!-- ── VIEW 7: Set new password (after clicking reset link) ── -->
+    <div class="view" id="view-new-password">
+      <div class="success-icon-wrap" style="background:var(--blue-lt)">
+        <i class="fa-solid fa-lock" style="color:var(--blue)"></i>
+      </div>
+      <div class="form-heading">Set new password</div>
+      <div class="form-subheading">Choose a strong password for your Solenetec portal account.</div>
+
+      <div class="error-msg" id="newpw-error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="newpw-error-text">Something went wrong. Please try again.</span>
+      </div>
+
+      <div class="field">
+        <label for="new-password">New password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" id="new-password" placeholder="Min. 12 characters"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="confirm-password">Confirm password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" id="confirm-password" placeholder="Repeat your new password"/>
+        </div>
+      </div>
+
+      <div class="security-note" style="margin-bottom:16px">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Minimum 12 characters. Include uppercase, numbers, and symbols for best security.</span>
+      </div>
+
+      <button class="primary-btn" id="newpw-btn" onclick="handleSetNewPassword()">
+        <span class="spinner" id="newpw-spinner"></span>
+        <span id="newpw-btn-text">Set new password</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── View switching ──
+  function showView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ── Password toggle ──
+  document.getElementById('toggle-pw').addEventListener('click', function() {
+    const inp = document.getElementById('password');
+    const eye = document.getElementById('pw-eye');
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      eye.className = 'fa-regular fa-eye-slash';
+    } else {
+      inp.type = 'password';
+      eye.className = 'fa-regular fa-eye';
+    }
+  });
+
+  // ── Supabase config ──────────────────────────────────────────
+  const SUPABASE_URL      = 'YOUR_SUPABASE_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+  let _supabase = null;
+  let _mfaChallengeId = null;
+  let _mfaFactorId = null;
+  let _currentEmail = '';
+  let _recoveryToken = null;
+  let _recoveryEmail = null;
+
+  function getSupabase() {
+    if (_supabase) return _supabase;
+    if (!window.supabase) { console.error('Supabase SDK not loaded'); return null; }
+    _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: 'solenetec_portal_session'
+      }
+    });
+    return _supabase;
+  }
+
+  // Init after SDK is loaded (SDK loaded via <script> tag in <head>)
+  window.addEventListener('load', () => {
+    const sb = getSupabase();
+    if (!sb) return;
+
+    // Detect recovery token in URL — don't sign out if resetting password
+    const params = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.replace('#',''));
+    const isRecovery = params.get('type') === 'recovery' || hashParams.get('type') === 'recovery';
+    const isPwUpdated = params.get('pw') === 'updated';
+
+    if (isRecovery) {
+      // Handle password reset flow — don't clear session
+      const token = params.get('token') || hashParams.get('access_token');
+      const email = params.get('email') || hashParams.get('email');
+      if (token) {
+        _recoveryToken = token;
+        _recoveryEmail = email;
+        showView('view-new-password');
+        history.replaceState(null, '', window.location.pathname);
+      }
+    } else {
+      // Only clear session if coming from explicit logout (not normal navigation)
+      // The logout button handles signOut itself — we don't need to do it here
+      sessionStorage.clear();
+    }
+
+    // Show password updated success message
+    if (isPwUpdated) {
+      const err = document.getElementById('signin-error');
+      const txt = document.getElementById('signin-error-text');
+      if (err && txt) {
+        txt.textContent = 'Password updated! Sign in with your new password.';
+        err.style.background = 'var(--green-lt, #dcfce7)';
+        err.style.borderColor = '#bbf7d0';
+        err.style.color = '#15803d';
+        err.querySelector('i').className = 'fa-solid fa-circle-check';
+        err.classList.add('show');
+      }
+    }
+
+    // Handle auth state changes — only redirect after explicit user action
+    let _pageJustLoaded = true;
+    setTimeout(() => { _pageJustLoaded = false; }, 2000);
+
+    sb.auth.onAuthStateChange((event, session) => {
+      if (_pageJustLoaded) return; // ignore events on initial load
+      if (event === 'PASSWORD_RECOVERY') {
+        showView('view-new-password');
+      } else if (event === 'SIGNED_IN' && session) {
+        const active = document.querySelector('.view.active');
+        if (active && active.id !== 'view-new-password' && active.id !== 'view-mfa') {
+          window.location.href = 'portal-dashboard.html';
+        }
+      }
+    });
+  });
+
+  // ── Sign in ───────────────────────────────────────────────────
+  async function handleSignIn() {
+    const email = document.getElementById('email').value.trim();
+    const pw    = document.getElementById('password').value;
+    const errBox = document.getElementById('signin-error');
+    errBox.classList.remove('show');
+
+    if (!email || !pw) {
+      document.getElementById('signin-error-text').textContent = 'Please enter your email and password.';
+      errBox.classList.add('show');
+      return;
+    }
+
+    const btn     = document.getElementById('signin-btn');
+    const spinner = document.getElementById('signin-spinner');
+    const btnText = document.getElementById('signin-btn-text');
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = 'Signing in…';
+
+    try {
+      const sb = getSupabase();
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+      if (error) throw error;
+
+      _currentEmail = email;
+
+      // Check for enrolled TOTP factors
+      const { data: factorData } = await sb.auth.mfa.listFactors();
+      const totp = factorData?.totp?.[0];
+
+      if (totp) {
+        // Has TOTP — show MFA screen
+        const { data: challenge, error: cErr } = await sb.auth.mfa.challenge({ factorId: totp.id });
+        if (cErr) throw cErr;
+        _mfaChallengeId = challenge.id;
+        _mfaFactorId = totp.id;
+        document.getElementById('mfa-email-display').textContent = email;
+        showView('view-mfa');
+        startResendTimer();
+        setTimeout(() => document.getElementById('otp-0').focus(), 100);
+      } else {
+        // No MFA enrolled — go straight to dashboard
+        window.location.href = 'portal-dashboard.html';
+      }
+
+    } catch (err) {
+      document.getElementById('signin-error-text').textContent =
+        err.message === 'Invalid login credentials'
+          ? 'Incorrect email or password. Please try again.'
+          : err.message;
+      errBox.classList.add('show');
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = 'Sign in to portal';
+    }
+  }
+
+  // ── OTP input handling ────────────────────────────────────────
+  const otpInputs = document.querySelectorAll('.otp-input');
+  otpInputs.forEach((inp, i) => {
+    inp.addEventListener('input', function() {
+      const val = this.value.replace(/\D/g,'');
+      this.value = val;
+      if (val) {
+        this.classList.add('filled');
+        if (i < 5) otpInputs[i+1].focus();
+      } else {
+        this.classList.remove('filled');
+      }
+      checkOTPComplete();
+    });
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' && !this.value && i > 0) {
+        otpInputs[i-1].focus();
+        otpInputs[i-1].value = '';
+        otpInputs[i-1].classList.remove('filled');
+      }
+    });
+    inp.addEventListener('paste', function(e) {
+      e.preventDefault();
+      const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      paste.split('').forEach((ch, j) => {
+        if (otpInputs[j]) { otpInputs[j].value = ch; otpInputs[j].classList.add('filled'); }
+      });
+      if (paste.length > 0) otpInputs[Math.min(paste.length, 5)].focus();
+      checkOTPComplete();
+    });
+  });
+
+  function checkOTPComplete() {
+    const code = Array.from(otpInputs).map(i => i.value).join('');
+    if (code.length === 6) handleMFA();
+  }
+
+  // ── MFA verify ───────────────────────────────────────────────
+  async function handleMFA() {
+    const code = Array.from(otpInputs).map(i => i.value).join('');
+    if (code.length < 6) return;
+
+    const btn     = document.getElementById('mfa-btn');
+    const spinner = document.getElementById('mfa-spinner');
+    const btnText = document.getElementById('mfa-btn-text');
+    document.getElementById('mfa-error').classList.remove('show');
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = 'Verifying…';
+
+    try {
+      if (_mfaFactorId && _mfaChallengeId) {
+        // TOTP verify — use factorId and challengeId separately
+        const { error } = await getSupabase().auth.mfa.verify({
+          factorId:    _mfaFactorId,
+          challengeId: _mfaChallengeId,
+          code
+        });
+        if (error) throw error;
+      } else {
+        throw new Error('MFA session expired. Please sign in again.');
+      }
+      window.location.href = 'portal-dashboard.html';
+
+    } catch (err) {
+      document.getElementById('mfa-error').classList.add('show');
+      otpInputs.forEach(i => { i.value = ''; i.classList.remove('filled'); });
+      otpInputs[0].focus();
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = 'Verify & sign in';
+    }
+  }
+
+  // ── Resend timer ─────────────────────────────────────────────
+  let resendInterval;
+  function startResendTimer() {
+    let secs = 30;
+    const btn   = document.getElementById('resend-btn');
+    const timer = document.getElementById('resend-timer');
+    btn.disabled = true;
+    clearInterval(resendInterval);
+    resendInterval = setInterval(() => {
+      secs--;
+      timer.textContent = secs + 's';
+      if (secs <= 0) {
+        clearInterval(resendInterval);
+        btn.disabled = false;
+        btn.innerHTML = 'Resend code';
+      }
+    }, 1000);
+  }
+
+  // ── Magic link ───────────────────────────────────────────────
+  async function handleMagicLink() {
+    const email = document.getElementById('magic-email').value.trim();
+    if (!email) return;
+    const spinner = document.getElementById('magic-spinner');
+    const btnText = document.getElementById('magic-btn-text');
+    spinner.style.display = 'block';
+    btnText.textContent = 'Sending…';
+
+    try {
+      const { error } = await getSupabase().auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: 'https://portal.solenetec.com/portal-dashboard.html',
+          shouldCreateUser: false
+        }
+      });
+      if (error) throw error;
+      document.getElementById('magic-email-display').textContent = email;
+      showView('view-magic-sent');
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      spinner.style.display = 'none';
+      btnText.textContent = 'Send magic link';
+    }
+  }
+
+  // ── Forgot password ──────────────────────────────────────────
+  async function handleForgotPassword() {
+    const email = document.getElementById('reset-email').value.trim();
+    if (!email) return;
+    const spinner = document.getElementById('reset-spinner');
+    const btnText = document.getElementById('reset-btn-text');
+    spinner.style.display = 'block';
+    btnText.textContent = 'Sending…';
+
+    try {
+      const { error } = await getSupabase().auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://portal.solenetec.com/portal-login.html'
+      });
+      if (error) throw error;
+      document.getElementById('reset-email-display').textContent = email;
+      showView('view-reset-sent');
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      spinner.style.display = 'none';
+      btnText.textContent = 'Send reset link';
+    }
+  }
+
+  // ── Set new password (after recovery link) ──────────────────
+  let _recoveryDomListenerAdded = false;
+
+  // Extract token from URL on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.replace('#',''));
+
+    const type  = params.get('type')  || hashParams.get('type');
+    const token = params.get('token') || hashParams.get('access_token');
+    const email = params.get('email') || hashParams.get('email');
+
+    if (type === 'recovery' && token) {
+      _recoveryToken = token;
+      _recoveryEmail = email;
+      showView('view-new-password');
+      // Clear URL bar for security
+      history.replaceState(null, '', window.location.pathname);
+    }
+  });
+
+  async function handleSetNewPassword() {
+    const pw1 = document.getElementById('new-password').value;
+    const pw2 = document.getElementById('confirm-password').value;
+    const errBox  = document.getElementById('newpw-error');
+    const errText = document.getElementById('newpw-error-text');
+    errBox.classList.remove('show');
+
+    if (!pw1 || pw1.length < 12) {
+      errText.textContent = 'Password must be at least 12 characters.';
+      errBox.classList.add('show');
+      return;
+    }
+    if (pw1 !== pw2) {
+      errText.textContent = 'Passwords do not match.';
+      errBox.classList.add('show');
+      return;
+    }
+
+    const btn     = document.getElementById('newpw-btn');
+    const spinner = document.getElementById('newpw-spinner');
+    const btnText = document.getElementById('newpw-btn-text');
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = 'Saving…';
+
+    try {
+      const sb = getSupabase();
+
+      // Exchange the OTP token for a session first
+      if (_recoveryToken && _recoveryEmail) {
+        const { error: otpErr } = await sb.auth.verifyOtp({
+          email: _recoveryEmail,
+          token: _recoveryToken,
+          type: 'recovery'
+        });
+        if (otpErr) throw otpErr;
+      }
+
+      // Now update the password
+      const { error } = await sb.auth.updateUser({ password: pw1 });
+      if (error) throw error;
+
+      await sb.auth.signOut();
+      window.location.href = 'portal-login.html?pw=updated';
+
+    } catch (err) {
+      errText.textContent = err.message || 'Failed to set password. Please try again.';
+      errBox.classList.add('show');
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = 'Set new password';
+    }
+  }
+
+  // Show success message if redirected after password set
+  if (window.location.search.includes('pw=updated')) {
+    window.addEventListener('DOMContentLoaded', () => {
+      const err = document.getElementById('signin-error');
+      const txt = document.getElementById('signin-error-text');
+      if (err && txt) {
+        txt.textContent = 'Password updated! Sign in with your new password.';
+        err.style.background = 'var(--green-lt)';
+        err.style.borderColor = 'var(--green-mid)';
+        err.style.color = 'var(--green)';
+        err.querySelector('i').className = 'fa-solid fa-circle-check';
+        err.classList.add('show');
+      }
+    });
+  }
+
+  // ── Enter key support ────────────────────────────────────────
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    const active = document.querySelector('.view.active');
+    if (!active) return;
+    if (active.id === 'view-signin')      handleSignIn();
+    if (active.id === 'view-magic-form')  handleMagicLink();
+    if (active.id === 'view-forgot')      handleForgotPassword();
+  });
+
+</script>
+</body>
+</html>
